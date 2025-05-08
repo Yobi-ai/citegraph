@@ -7,7 +7,7 @@ Citation Network
 
 ## 1. Team Information
 - [ ] Team Name: Blue Team
-- [ ] Team Members (Name & Email): Alen Koikkara (akoikkar@depaul.edu), Sujay Pookkattuparambil()
+- [ ] Team Members (Name & Email): Alen Koikkara (akoikkar@depaul.edu), Sujay Pookkattuparambil(spookkat@depaul.edu)
 - [ ] Course & Section: SE 489
 
 ## 2. Project Overview
