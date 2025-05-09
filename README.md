@@ -37,7 +37,7 @@ The architecture diagram above illustrates the MLOps workflow of CiteGraph, show
 ### Prerequisites
 - Python 3.11 or higher
 - Git
-- pip (Python package installer)
+- Conda (Anaconda or Miniconda)
 
 ### Environment Setup
 
@@ -47,19 +47,25 @@ git clone https://github.com/yourusername/citegraph.git
 cd citegraph
 ```
 
-2. Create and activate a virtual environment (recommended):
+2. Create and activate a conda environment:
 ```bash
-# Using venv (built into Python)
-python -m venv venv
-source venv/bin/activate  # On Unix/macOS
-# OR
-.\venv\Scripts\activate  # On Windows
-```
+# Create a new conda environment
+conda create -n citegraph python=3.11
+conda activate citegraph
 
-3. Install dependencies:
-```bash
+# Install other dependencies from requirements.txt
 pip install -r requirements.txt
 ```
+
+### Project Dependencies
+The project uses the following main dependencies:
+- PyTorch (~=2.5)
+- TensorFlow (~=2.18)
+- PyTorch Geometric (~=2.5)
+- NetworkX (~=3.4)
+- scikit-learn (~=1.6)
+- isort (==6.0.1)
+- ruff (==0.11.8)
 
 ### Running the Code
 
@@ -102,13 +108,6 @@ ruff check .
 
 # Run mypy for type checking
 mypy .
-```
-
-### Using MLflow
-
-The project uses MLflow for experiment tracking. To view the MLflow UI:
-```bash
-mlflow ui
 ```
 
 ## 6. Contribution Summary
