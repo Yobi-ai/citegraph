@@ -93,11 +93,6 @@ python src/models/model1/predict.py
 
 ### Development Setup
 
-For development, install additional development dependencies:
-```bash
-pip install ruff isort mypy
-```
-
 Run code quality checks:
 ```bash
 # Run isort to sort imports
