@@ -3,6 +3,52 @@ citegraph
 
 Citation Network
 
+# Project Title
+
+## 1. Team Information
+- [ ] Team Name: Blue Team
+- [ ] Team Members (Name & Email): Alen Koikkara (akoikkar@depaul.edu), Sujay Pookkattuparambil(spookkat@depaul.edu)
+- [ ] Course & Section: SE 489
+
+## 2. Project Overview
+- [ ] Brief summary of the project (2-3 sentences):
+        CiteGraph is a GNN based system for classifying research papers into topics using the structure and content of a citation network.
+        It uses node features and edge connections to improve classification performance.
+- [ ] Problem statement and motivation:
+
+- [ ] Main objectives:
+        - Build a reproducible ML pipeline for classifying nodes in a citation network.
+        - Use graph-based models (GCN/GAT) for semi-supervised node classification.
+        - Integrate open-source tooling (StellarGraph + MLflow) into a sustainable MLOps workflow.
+        - Track experiments and version control collaboratively using Git and Cookiecutter.
+
+## 3. Project Architecture Diagram
+- [ ] Insert or link to your architecture diagram (e.g., draw.io, PNG, etc.)
+
+## 4. Phase Deliverables
+- [ ] [PHASE1.md](./PHASE1.md): Project Design & Model Development
+- [ ] [PHASE2.md](./PHASE2.md): Enhancing ML Operations
+- [ ] [PHASE3.md](./PHASE3.md): Continuous ML & Deployment
+
+## 5. Setup Instructions
+- [ ] How to set up the environment (conda/pip, requirements.txt, Docker, etc.)
+- [ ] How to run the code and reproduce results
+
+## 6. Contribution Summary
+- [ ] Briefly describe each team member's contributions
+
+## 7. References
+- [ ] List of datasets, frameworks, and major third-party tools used
+        - Python 3.11
+        - Pytorch
+        - Pytorch Geometric
+        - MLflow
+        - scikit-learn
+        - matplotlib
+        - numpy
+        - pandas
+
+
 Project Organization
 ------------
 
