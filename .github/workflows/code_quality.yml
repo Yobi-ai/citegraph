@@ -39,15 +39,15 @@ jobs:
     - name: Run mypy
       run: mypy .
 
-    - name: Create Pull Request or Push to main
-      uses: peter-evans/create-pull-request@v5
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: 'chore: version bump'
-        title: 'chore: version bump'
-        body: 'Automated version bump'
-        branch: version-bump
-        base: main
-        labels: |
-          automated pr
-          version bump 
+    # - name: Create Pull Request or Push to main
+    #   uses: peter-evans/create-pull-request@v5
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     commit-message: 'chore: version bump'
+    #     title: 'chore: version bump'
+    #     body: 'Automated version bump'
+    #     branch: version-bump
+    #     base: main
+    #     labels: |
+    #       automated pr
+    #       version bump 
