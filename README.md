@@ -23,7 +23,9 @@ Citation Network
         - Track experiments and version control collaboratively using Git and Cookiecutter.
 
 ## 3. Project Architecture Diagram
-- [ ] Insert or link to your architecture diagram (e.g., draw.io, PNG, etc.)
+![MLOps Architecture](reports/figures/architecturemlops.png)
+
+The architecture diagram above illustrates the MLOps workflow of CiteGraph, showing the integration of data processing, model training, and deployment components.
 
 ## 4. Phase Deliverables
 - [ ] [PHASE1.md](./PHASE1.md): Project Design & Model Development
@@ -31,8 +33,83 @@ Citation Network
 - [ ] [PHASE3.md](./PHASE3.md): Continuous ML & Deployment
 
 ## 5. Setup Instructions
-- [ ] How to set up the environment (conda/pip, requirements.txt, Docker, etc.)
-- [ ] How to run the code and reproduce results
+
+### Prerequisites
+- Python 3.11 or higher
+- Git
+- pip (Python package installer)
+
+### Environment Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/citegraph.git
+cd citegraph
+```
+
+2. Create and activate a virtual environment (recommended):
+```bash
+# Using venv (built into Python)
+python -m venv venv
+source venv/bin/activate  # On Unix/macOS
+# OR
+.\venv\Scripts\activate  # On Windows
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Running the Code
+
+1. Data Preparation:
+```bash
+# Download and prepare the dataset
+python src/data/ingestion.py
+python src/data/cleaning.py
+python src/data/build_features.py
+```
+
+2. Training the Model:
+```bash
+# Train the model with default configuration
+python src/models/model1/train.py
+
+# For hyperparameter tuning
+python src/models/model1/hyperparameters_tuning.py
+```
+
+3. Making Predictions:
+```bash
+python src/models/model1/predict.py
+```
+
+### Development Setup
+
+For development, install additional development dependencies:
+```bash
+pip install ruff isort mypy
+```
+
+Run code quality checks:
+```bash
+# Run isort to sort imports
+isort .
+
+# Run ruff for linting
+ruff check .
+
+# Run mypy for type checking
+mypy .
+```
+
+### Using MLflow
+
+The project uses MLflow for experiment tracking. To view the MLflow UI:
+```bash
+mlflow ui
+```
 
 ## 6. Contribution Summary
 - [ ] Briefly describe each team member's contributions
