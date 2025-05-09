@@ -1,0 +1,53 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install ruff isort mypy
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run isort
+      run: isort . --check-only
+
+    - name: Run ruff
+      run: ruff check .
+
+    - name: Run mypy
+      run: mypy .
+
+    - name: Create Pull Request or Push to main
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: version bump'
+        title: 'chore: version bump'
+        body: 'Automated version bump'
+        branch: version-bump
+        base: main
+        labels: |
+          automated pr
+          version bump 
