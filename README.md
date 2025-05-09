@@ -107,6 +107,8 @@ mypy .
 
 ## 6. Contribution Summary
 - [ ] Briefly describe each team member's contributions
+        Alen: Setting up the workflow, Architecure diagram, Linting, formatting tools setup with git actions.
+        Sujay: Environment, requirements, model piplines, data versioning, model training and evaluation.
 
 ## 7. References
 - [ ] List of datasets, frameworks, and major third-party tools used
