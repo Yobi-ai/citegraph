@@ -1,0 +1,6 @@
+outs:
+- md5: e4e410842e0ceb77a0f45bbad3d6856f.dir
+  size: 16297508
+  nfiles: 11
+  hash: md5
+  path: Cora
