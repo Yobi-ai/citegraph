@@ -2,8 +2,9 @@ import torch
 from torch_geometric.datasets import Planetoid
 from torch_geometric.transforms import NormalizeFeatures
 
-from model import GCN, Model
 from dataloader import Dataset
+from model import GCN, Model
+
 
 class Inference:
     def __init__(self, model_path: str, data_path: str):
