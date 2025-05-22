@@ -17,3 +17,26 @@ class GCN(torch.nn.Module):
         x = self.conv2(x, edge_index)
         x = self.linear(x)
         return F.log_softmax(x, dim=1)
+    
+class Model:
+    def __init__(self, model_path:str):
+        self._model = None
+        self.__load(model_path)
+
+    def __load(self, model_path:str):
+        self._model = torch.load(model_path, weights_only=False)
+
+    def train(self):
+        if self._model is not None:
+            self._model.train()
+    
+    def eval(self):
+        if self._model is not None:
+            self._model.eval()
+
+    def __call__(self, input:torch.Tensor, edge_index: torch.Tensor):
+        if self._model is not None:
+            return self._model(input, edge_index)
+        
+    def __str__(self):
+        return f"Model object: \n {self._model}"
