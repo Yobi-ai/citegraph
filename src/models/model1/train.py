@@ -1,6 +1,5 @@
 import torch
 import torch.nn.functional as F
-
 from dataloader import Dataset
 from model import GCN
 
