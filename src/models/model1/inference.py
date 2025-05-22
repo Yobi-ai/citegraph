@@ -1,9 +1,11 @@
+import os
+
 import torch
+from dataloader import Dataset
+from model import GCN, Model
 from torch_geometric.datasets import Planetoid
 from torch_geometric.transforms import NormalizeFeatures
 
-from model import GCN, Model
-from dataloader import Dataset
 
 class Inference:
     def __init__(self, model_path: str, data_path: str):
@@ -33,11 +35,11 @@ class Inference:
         return self._label_dict[pred[idx].item()]
 
 if __name__ == "__main__":
-    #model_path = "D:/Sujays documents & files/MS/IDP/Uni Acceptance Letters/DePaul/Classes/Quarter 6/SE489_MLOps/Project/citegraph/models/model_5000.pth"
-    model_path = "../../../models/model_5000.pth"
-    
-    data_path = "../../data/"
+    model_path = os.getenv('MODEL_PATH', '../../../models/model_5000.pth')
+    data_path = os.getenv('DATA_PATH', '../../data/')
+
+    print(f"Loading model from: {model_path}")
+    print(f"Loading data from: {data_path}")
 
     inf_obj = Inference(model_path, data_path)
-
     print(inf_obj.run_sample(999))
