@@ -1,9 +1,8 @@
 import torch
-from torch_geometric.datasets import Planetoid
-from torch_geometric.transforms import NormalizeFeatures
-
 from dataloader import Dataset
 from model import GCN, Model
+from torch_geometric.datasets import Planetoid
+from torch_geometric.transforms import NormalizeFeatures
 
 
 class Inference:
