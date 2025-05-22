@@ -1,7 +1,9 @@
-from model import GCN
 import torch
-from dataloader import Dataset
 import torch.nn.functional as F
+
+from dataloader import Dataset
+from model import GCN
+
 
 class Trainer:
     def __init__(self, epochs = 5000, model_save_freq = 1000, print_stats_freq = 50):
