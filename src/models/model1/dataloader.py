@@ -9,4 +9,4 @@ class Dataset:
 
     def load_cora(self, data_path):
         self.dataset = Planetoid(root=data_path, name='Cora', transform=NormalizeFeatures())
-        return self.dataset[0]
+        return self.dataset
