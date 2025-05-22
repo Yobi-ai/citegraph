@@ -1,6 +1,7 @@
 from torch_geometric.datasets import Planetoid
 from torch_geometric.transforms import NormalizeFeatures
 
+
 class Dataset:
     def __init__(self):
         self.dataset = None
