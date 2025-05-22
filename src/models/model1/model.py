@@ -1,10 +1,11 @@
+import logging
+import os
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
-import logging
 from rich import print
-import os
+from torch_geometric.nn import GCNConv
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')

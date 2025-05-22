@@ -1,11 +1,12 @@
+import logging
+import os
+
 import torch
 from dataloader import Dataset
 from model import GCN, Model
+from rich import print
 from torch_geometric.datasets import Planetoid
 from torch_geometric.transforms import NormalizeFeatures
-import logging
-from rich import print
-import os
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
