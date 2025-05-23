@@ -114,9 +114,61 @@ To analyze the profiling results:
 ```bash
 # Using pstats (built-in Python profiler analysis tool)
 python -m pstats training_profile.prof
-
+```
 
 The profiling results are automatically saved to `training_profile.prof` after each training run, and the top 20 time-consuming functions are displayed in the console output.
+
+### System Resource Monitoring
+
+The project uses psutil for system resource monitoring during training. This helps track resource usage and identify potential bottlenecks.
+
+#### Monitored Metrics
+
+1. CPU Metrics
+   - CPU usage percentage
+   - Total CPU time
+
+2. Memory Metrics
+   - Total system memory
+   - Used memory
+   - Memory usage in GB
+
+#### Resource Monitoring Output
+
+The system metrics are displayed in a simple format during training:
+```
+[Epoch 1] CPU: 45.2% | RAM: 2.5 / 16.0 GB
+```
+
+#### Usage in Code
+
+```python
+import psutil
+
+def get_cpu_usage():
+    return psutil.cpu_percent()
+
+def get_memory_usage():
+    mem = psutil.virtual_memory()
+    return mem.used / (1024 ** 3), mem.total / (1024 ** 3)
+
+def log_system_metrics(epoch=None):
+    cpu = get_cpu_usage()
+    used_mem, total_mem = get_memory_usage()
+    print(f"[Epoch {epoch}] CPU: {cpu}% | RAM: {used_mem:.2f} / {total_mem:.2f} GB")
+```
+
+#### Best Practices
+
+1. Resource Monitoring
+   - Monitor CPU usage during training
+   - Track memory consumption
+   - Log metrics at regular intervals
+
+2. Performance Optimization
+   - Adjust batch sizes based on memory usage
+   - Monitor CPU utilization for bottlenecks
+   - Use metrics to optimize data loading
 
 ### Development Setup
 
