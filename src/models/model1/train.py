@@ -1,12 +1,20 @@
 import csv
 import logging
 import os
+import sys
+from pathlib import Path
+
+# Add src directory to Python path
+src_path = str(Path(__file__).parent.parent.parent)
+if src_path not in sys.path:
+    sys.path.append(src_path)
 
 import torch
 import torch.nn.functional as F
 from dataloader import Dataset
 from model import GCN
 from rich import print
+from utils.monitor import log_system_metrics
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
@@ -79,6 +87,7 @@ class Trainer:
         try:
             for epoch in range(1, self._epochs + 1):
                 train_loss = self.__train_epoch(self.model, self.optimizer)
+                log_system_metrics(epoch)
                 val_loss, acc, embeddings = self.__validate_epoch(self.model)
                 #embeddings_over_time.append(embeddings)
                 train_acc, val_acc = acc

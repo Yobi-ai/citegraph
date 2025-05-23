@@ -69,27 +69,6 @@ The project uses the following main dependencies:
 
 ### Running the Code
 
-1. Data Preparation:
-```bash
-# Download and prepare the dataset
-python src/data/ingestion.py
-python src/data/cleaning.py
-python src/data/build_features.py
-```
-
-2. Training the Model:
-```bash
-# Train the model with default configuration
-python src/models/model1/train.py
-
-# For hyperparameter tuning
-python src/models/model1/hyperparameters_tuning.py
-```
-
-3. Making Predictions:
-```bash
-python src/models/model1/predict.py
-```
 
 ### Development Setup
 
