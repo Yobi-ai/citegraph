@@ -4,11 +4,6 @@ import os
 import sys
 from pathlib import Path
 
-# Add src directory to Python path
-src_path = str(Path(__file__).parent.parent.parent)
-if src_path not in sys.path:
-    sys.path.append(src_path)
-
 import random
 import hydra
 import numpy as np
@@ -18,6 +13,13 @@ from dataloader import Dataset
 from model import GCN
 from omegaconf import DictConfig, OmegaConf
 from rich import print
+import mlflow
+
+# Add src directory to Python path
+src_path = str(Path(__file__).parent.parent.parent)
+if src_path not in sys.path:
+    sys.path.append(src_path)
+
 from utils.monitor import log_system_metrics
 
 logger = logging.getLogger(__name__)
@@ -32,6 +34,9 @@ file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.propagate = False
+
+mlflow.set_tracking_uri("file:./mlruns")
+mlflow.set_experiment("citegraph")
 
 class Trainer:
     def __init__(self, cfg):
@@ -97,43 +102,62 @@ class Trainer:
     def train(self):
         print("Starting Training")
         logger.info("Starting Training")
-        try:
-            for epoch in range(1, self._epochs + 1):
-                train_loss = self.__train_epoch(self.model, self.optimizer)
-                log_system_metrics(epoch)
-                val_loss, acc, embeddings = self.__validate_epoch(self.model)
-                #embeddings_over_time.append(embeddings)
-                train_acc, val_acc = acc
-                self._train_loss_over_time.append(train_loss)
-                self._val_loss_over_time.append(val_loss)
-                self._train_acc_over_time.append(train_acc)
-                self._val_acc_over_time.append(val_acc)
-                self._csv_writer.writerow([train_loss, train_acc, val_loss, val_acc])
-                if epoch % self._print_stats_freq == 0:
-                    print(f'[yellow]Epoch: {epoch:03d}, '
-                        f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
-                        f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]')
-                    logger.info(f'Epoch: {epoch:03d}, '
-                        f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
-                        f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}')
-                if epoch % self._model_save_freq == 0:
-                    print(f'Saving model at [green]epoch {epoch}[/green]')
-                    logger.info(f'Saving model at epoch {epoch}')
-                    torch.save(self.model, f'./model_{epoch}.pth')
-            print("[bold green]Training Completed Successfully![/bold green]")
-            logger.info("Training Completed Successfully!")
+
+        mlflow.pytorch.autolog()
         
-        except KeyboardInterrupt:
-            print("Keyboard Interrupt\n[bold red]Stopping Training![/bold red]")
-            logger.info("Keyboard Interrupt\nStopping Training!")
+        with mlflow.start_run(run_name="gcn-train"):
+            try:
+                for epoch in range(1, self._epochs + 1):
+                    train_loss = self.__train_epoch(self.model, self.optimizer)
+                    val_loss, acc, embeddings = self.__validate_epoch(self.model)
+                    #embeddings_over_time.append(embeddings)
+                    train_acc, val_acc = acc
+                    
+                    self._train_loss_over_time.append(train_loss)
+                    self._val_loss_over_time.append(val_loss)
+                    self._train_acc_over_time.append(train_acc)
+                    self._val_acc_over_time.append(val_acc)
+                    self._csv_writer.writerow([epoch, train_loss, train_acc, val_loss, val_acc])
+                    
+                    mlflow.log_metric("train_loss", train_loss)
+                    mlflow.log_metric("train_accuracy", train_acc)
+                    mlflow.log_metric("val_loss", val_loss)
+                    mlflow.log_metric("val_accuracy", val_acc)
+
+                    log_system_metrics(epoch)
+                    
+                    if epoch % self._print_stats_freq == 0:
+                        print(f'[yellow]Epoch: {epoch:03d}, '
+                            f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
+                            f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]')
+                        logger.info(f'Epoch: {epoch:03d}, '
+                            f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
+                            f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}')
+                    
+                    if epoch % self._model_save_freq == 0:
+                        print(f'Saving model at [green]epoch {epoch}[/green]')
+                        logger.info(f'Saving model at epoch {epoch}')
+                        torch.save(self.model, f'./model_{epoch}.pth')
+                        mlflow.pytorch.log_model(self.model, f'model_{epoch}')
+                
+                print("[bold green]Training Completed Successfully![/bold green]")
+                logger.info("Training Completed Successfully!")
+                print(f"mlflow run ID: {mlflow.active_run().info.run_id}")
+            
+            except KeyboardInterrupt:
+                print("Keyboard Interrupt\n[bold red]Stopping Training![/bold red]")
+                logger.info("Keyboard Interrupt\nStopping Training!")
+                print(f"mlflow run ID: {mlflow.active_run().info.run_id}")
+        
         self.__cleanup()
 
     def __cleanup(self):
         self._file.close()
 
-@hydra.main(version_base=None, config_path="confs", config_name="training_conf")
+@hydra.main(version_base=None, config_path="confs/train", config_name="training_conf")
 def main(cfg):
     logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
+    print(f"[yellow]Configuration:\n{OmegaConf.to_yaml(cfg)}[/yellow]")
     trainer_obj = Trainer(cfg)
     trainer_obj.train()
 

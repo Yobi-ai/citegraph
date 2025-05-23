@@ -10,6 +10,8 @@ from rich import print
 from torch_geometric.datasets import Planetoid
 from torch_geometric.transforms import NormalizeFeatures
 
+import mlflow
+
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
 if "logs" not in os.listdir():
@@ -52,7 +54,7 @@ class Inference:
 
         return pred_idx, pred_label
 
-@hydra.main(version_base=None, config_path="confs", config_name="inference_conf")
+@hydra.main(version_base=None, config_path="confs/inference", config_name="inference_conf")
 def main(cfg):
     logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
     inf_obj = Inference(cfg)
