@@ -10,7 +10,13 @@ log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
 if "logs" not in os.listdir():
     os.mkdir("logs")
 FORMAT = '%(asctime)s | %(levelname)s | %(message)s'
-logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=logging.INFO)
+#logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=logging.INFO)
+formatter = logging.Formatter(FORMAT)
+file_handler = logging.FileHandler(f"{log_dir}/citegraph.log")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.propagate = False
 
 class Dataset:
     def __init__(self):
