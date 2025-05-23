@@ -20,7 +20,7 @@ Citation Network
 - [ ] Main objectives:
         - Build a reproducible ML pipeline for classifying nodes in a citation network.
         - Use graph-based models (GCN/GAT) for semi-supervised node classification.
-        - Integrate open-source tooling (StellarGraph + MLflow) into a sustainable MLOps workflow.
+        - Integrate open-source tooling (PyTorch Geometric + MLflow) into a sustainable MLOps workflow.
         - Track experiments and version control collaboratively using Git and Cookiecutter.
         - Implement performance profiling and monitoring for model training and inference.
 
@@ -86,6 +86,39 @@ python src/models/model1/train.py
 python src/models/model1/inference.py
 ```
 
+### Modifying Configurations
+- The configurations can be found at src/models/model1/confs/
+- 'train' for training configurations and 'inference' for inference configurations.
+
+### Checking mlflow dashboard:
+- After running the training script, run the following on the terminal:
+```bash
+mlflow ui
+```
+- This will give you a link that will show the training result of all runs.
+- We can select any runs from there and check the metrics and artifacts.
+
+### Logging
+- Python Logging module is used for logging all major events in a file along with timestamps.
+- Rich is used to beautifully represent the major events on the running terminal.
+- Example for File Logging:
+```bash
+2025-05-22 23:38:58,814 | INFO | Starting Training
+2025-05-22 23:39:07,637 | INFO | Epoch: 050, Train Loss: 0.9625, Train Acc: 0.9571, Val Loss: 1.3314, Val Acc: 0.7680
+2025-05-22 23:39:16,093 | INFO | Epoch: 100, Train Loss: 0.0896, Train Acc: 1.0000, Val Loss: 0.7218, Val Acc: 0.7920
+```
+- Rich is used in the follwing way:
+```bash
+print(f'[yellow]Epoch: {epoch:03d}, '
+        f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
+        f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]')
+print("[bold green]Training Completed Successfully![/bold green]")
+```
+- Example for Rich:
+![alt text](https://github.com/Yobi-ai/citegraph/tree/main/images/rich_example.png "Rich Example")
+- These show how consistently the script is running without faults and will help monitor if there are any faults or issues with the results.
+
+
 ### Performance Profiling
 
 The project uses Python's built-in cProfile for performance profiling. During training, cProfile will:
@@ -103,7 +136,7 @@ The project uses Python's built-in cProfile for performance profiling. During tr
            100    0.034    0.000    0.456    0.005 utils.py:12(log_system_metrics)
 ```
 
-#### Key Metrics Explained
+#### Key Profiling Metrics Explained
 - `ncalls`: Number of times the function was called
 - `tottime`: Total time spent in the function (excluding subcalls)
 - `percall`: Average time per call (tottime/ncalls)
@@ -114,9 +147,61 @@ To analyze the profiling results:
 ```bash
 # Using pstats (built-in Python profiler analysis tool)
 python -m pstats training_profile.prof
-
+```
 
 The profiling results are automatically saved to `training_profile.prof` after each training run, and the top 20 time-consuming functions are displayed in the console output.
+
+### System Resource Monitoring
+
+The project uses psutil for system resource monitoring during training. This helps track resource usage and identify potential bottlenecks.
+
+#### Monitored Metrics
+
+1. CPU Metrics
+   - CPU usage percentage
+   - Total CPU time
+
+2. Memory Metrics
+   - Total system memory
+   - Used memory
+   - Memory usage in GB
+
+#### Resource Monitoring Output
+
+The system metrics are displayed in a simple format during training:
+```
+[Epoch 1] CPU: 45.2% | RAM: 2.5 / 16.0 GB
+```
+
+#### Usage in Code
+
+```python
+import psutil
+
+def get_cpu_usage():
+    return psutil.cpu_percent()
+
+def get_memory_usage():
+    mem = psutil.virtual_memory()
+    return mem.used / (1024 ** 3), mem.total / (1024 ** 3)
+
+def log_system_metrics(epoch=None):
+    cpu = get_cpu_usage()
+    used_mem, total_mem = get_memory_usage()
+    print(f"[Epoch {epoch}] CPU: {cpu}% | RAM: {used_mem:.2f} / {total_mem:.2f} GB")
+```
+
+#### Best Practices
+
+1. Resource Monitoring
+   - Monitor CPU usage during training
+   - Track memory consumption
+   - Log metrics at regular intervals
+
+2. Performance Optimization
+   - Adjust batch sizes based on memory usage
+   - Monitor CPU utilization for bottlenecks
+   - Use metrics to optimize data loading
 
 ### Development Setup
 
@@ -132,24 +217,50 @@ ruff check .
 mypy .
 ```
 
+### Code Debugging
+- The code was debugged using the built in debugger and breakpoint functionality of VS code.
+- Some Debugging Scenarios include:
+  -- Figuring out faults in configuration management: Fixed using output logs and break points helping to see which configuration was being taken.
+  -- Path issues: Issues with importing modules on a higher level. Fixed using sys library and setting higher directory as root at that moment.
+
 ## 6. Contribution Summary
 - [ ] Briefly describe each team member's contributions
 
-        Alen: Setting up the workflow, Architecture diagram, Linting, formatting tools setup with git actions, proposal documentation.
+        Alen:
+        - Setup project repository and initialised cookiecutter template. 
+        - Researched on project ideas and created the architecture diagram.
+        - Integrated linting and formatting tools with git actions. 
+        - Created proposal documentation.
+        - Created dockerfile and docker-compose.yml to build inference image
+        - Integrated psutil to log system usage metrics
+        - Integrated Cprofiler to create profile of funtions running and ouput to .prof file
+        - updated readme with necessary documentation.
 
-        Sujay: Environment, requirements, model pipelines, data versioning, model training and evaluation, proposal documentation.
+        Sujay: 
+        - Setup the Environment and requirements
+        - Initialized data versioning
+        - Created Training Notebook
+        - Created the model training and inference pipelines
+        - Trained model
+        - Contributed to Proposal documentation.
+        - Implemented Experiment Tracking using mlflow.
+        - Implemented configuration management using Hydra.
+        - Implemented logging using python logging and rich.
 
 ## 7. References
 - [ ] List of datasets, frameworks, and major third-party tools used
         - Python 3.11
+        - Cora Dataset
         - PyTorch
         - PyTorch Geometric
-        - MLflow
         - scikit-learn
         - matplotlib
         - numpy
         - pandas
         - cProfile (for performance profiling)
+        - mlflow
+        - Hydra
+        - Rich
 
 ### Docker Setup
 
