@@ -1,8 +1,18 @@
+import logging
+import os
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from rich import print
 from torch_geometric.nn import GCNConv
 
+logger = logging.getLogger(__name__)
+log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
+if "logs" not in os.listdir():
+    os.mkdir("logs")
+FORMAT = '%(asctime)s | %(levelname)s | %(message)s'
+logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=logging.INFO)
 
 class GCN(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
@@ -26,6 +36,8 @@ class Model:
 
     def __load(self, model_path:str):
         self._model = torch.load(model_path, weights_only=False)
+        logger.info('Model Loaded')
+        print("[bold green]Model Loaded Successfully[/bold green]")
 
     def train(self):
         if self._model is not None:
