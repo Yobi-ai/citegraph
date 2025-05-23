@@ -69,27 +69,6 @@ The project uses the following main dependencies:
 
 ### Running the Code
 
-1. Data Preparation:
-```bash
-# Download and prepare the dataset
-python src/data/ingestion.py
-python src/data/cleaning.py
-python src/data/build_features.py
-```
-
-2. Training the Model:
-```bash
-# Train the model with default configuration
-python src/models/model1/train.py
-
-# For hyperparameter tuning
-python src/models/model1/hyperparameters_tuning.py
-```
-
-3. Making Predictions:
-```bash
-python src/models/model1/predict.py
-```
 
 ### Development Setup
 
@@ -123,6 +102,32 @@ mypy .
         - numpy
         - pandas
 
+### Docker Setup
+
+#### GPU Version (with CUDA support)
+```bash
+# Build and run with GPU support
+docker-compose up --build
+
+# Run specific commands
+docker-compose run citegraph python src/models/model1/train.py
+```
+
+#### CPU Version (without GPU)
+```bash
+# Build and run without GPU
+docker-compose -f docker-compose.cpu.yml up --build
+
+# Run specific commands
+docker-compose -f docker-compose.cpu.yml run citegraph python src/models/model1/train.py
+```
+
+#### Docker Commands
+- Build the image: `docker-compose build`
+- Start the container: `docker-compose up`
+- Run a specific command: `docker-compose run citegraph <command>`
+- Stop the container: `docker-compose down`
+- View logs: `docker-compose logs -f`
 
 Project Organization
 ------------
