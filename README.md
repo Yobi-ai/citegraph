@@ -135,7 +135,15 @@ mypy .
 ## 6. Contribution Summary
 - [ ] Briefly describe each team member's contributions
 
-        Alen: Setting up the workflow, Architecture diagram, Linting, formatting tools setup with git actions, proposal documentation.
+        Alen:
+        - Setup project repository and initialised cookiecutter template. 
+        - Researched on project ideas and created the architecture diagram.
+        - Integrated linting and formatting tools with git actions. 
+        - Created proposal documentation.
+        - Created dockerfile and docker-compose.yml to build inference image
+        - Integrated psutil to log system usage metrics
+        - Integrated Cprofiler to create profile of funtions running and ouput to .prof file
+        - updated readme with necessary documentation.
 
         Sujay: Environment, requirements, model pipelines, data versioning, model training and evaluation, proposal documentation.
 
