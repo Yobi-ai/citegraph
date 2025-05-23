@@ -1,9 +1,9 @@
+import cProfile
 import csv
 import logging
 import os
-import sys
-import cProfile
 import pstats
+import sys
 from pathlib import Path
 
 # Add src directory to Python path
