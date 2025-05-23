@@ -1,6 +1,8 @@
+import cProfile
 import csv
 import logging
 import os
+import pstats
 import sys
 from pathlib import Path
 
@@ -10,6 +12,7 @@ if src_path not in sys.path:
     sys.path.append(src_path)
 
 import random
+
 import hydra
 import numpy as np
 import torch
@@ -18,6 +21,7 @@ from dataloader import Dataset
 from model import GCN
 from omegaconf import DictConfig, OmegaConf
 from rich import print
+
 from utils.monitor import log_system_metrics
 
 logger = logging.getLogger(__name__)
@@ -25,7 +29,6 @@ log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
 if "logs" not in os.listdir():
     os.mkdir("logs")
 FORMAT = '%(asctime)s | %(levelname)s | %(message)s'
-#logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=logging.INFO)
 formatter = logging.Formatter(FORMAT)
 file_handler = logging.FileHandler(f"{log_dir}/citegraph_train.log")
 file_handler.setLevel(logging.DEBUG)
@@ -97,12 +100,16 @@ class Trainer:
     def train(self):
         print("Starting Training")
         logger.info("Starting Training")
+        
+        # Create a Profile object
+        profiler = cProfile.Profile()
+        profiler.enable()
+        
         try:
             for epoch in range(1, self._epochs + 1):
                 train_loss = self.__train_epoch(self.model, self.optimizer)
                 log_system_metrics(epoch)
                 val_loss, acc, embeddings = self.__validate_epoch(self.model)
-                #embeddings_over_time.append(embeddings)
                 train_acc, val_acc = acc
                 self._train_loss_over_time.append(train_loss)
                 self._val_loss_over_time.append(val_loss)
@@ -124,12 +131,26 @@ class Trainer:
             logger.info("Training Completed Successfully!")
         
         except KeyboardInterrupt:
-            print("Keyboard Interrupt\n[bold red]Stopping Training![/bold red]")
-            logger.info("Keyboard Interrupt\nStopping Training!")
-        self.__cleanup()
-
-    def __cleanup(self):
-        self._file.close()
+            print("Keyboard Interrupt detected. Saving model...")
+            logger.info("Keyboard Interrupt detected. Saving model...")
+            torch.save(self.model, './model_interrupted.pth')
+            print("[bold yellow]Model saved as model_interrupted.pth[/bold yellow]")
+            logger.info("Model saved as model_interrupted.pth")
+        
+        finally:
+            # Disable profiler and save results
+            profiler.disable()
+            stats = pstats.Stats(profiler)
+            stats.sort_stats('cumulative')
+            stats.dump_stats('training_profile.prof')
+            print("[bold green]Profiling results saved to training_profile.prof[/bold green]")
+            logger.info("Profiling results saved to training_profile.prof")
+            
+            # Print top 20 time-consuming functions
+            print("\n[bold cyan]Top 20 Time-Consuming Functions:[/bold cyan]")
+            stats.strip_dirs().sort_stats('cumulative').print_stats(20)
+            
+            self._file.close()
 
 @hydra.main(version_base=None, config_path="confs", config_name="training_conf")
 def main(cfg):
@@ -138,9 +159,4 @@ def main(cfg):
     trainer_obj.train()
 
 if __name__ == "__main__":
-    # epochs = 5000
-    # model_save_freq = 1000
-    # print_stats_freq = 50
-
-    # data_path = "../../data/"
     main()
