@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  citegraph:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./reports:/app/reports
+    environment:
+      - MODEL_PATH=/app/models/model_5000.pth
+      - DATA_PATH=/app/data/processed
+    command: python src/models/model1/train.py 

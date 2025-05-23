@@ -1,0 +1,2 @@
+model_path: "../../../models/model_5000.pth"
+data_path: "../../data/"
