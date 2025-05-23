@@ -88,20 +88,35 @@ python src/models/model1/inference.py
 
 ### Performance Profiling
 
-The project includes built-in performance profiling using Python's cProfile. During training, the profiler will:
+The project uses Python's built-in cProfile for performance profiling. During training, cProfile will:
 - Track function call counts and execution times
 - Generate a detailed profile report (training_profile.prof)
 - Display the top 20 time-consuming functions
 - Save profiling results for later analysis
 
+#### Profiling Output Format
+```
+          ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+---------------------------------------------------------------
+             1    0.123    0.123    1.234    1.234 train.py:45(__train_epoch)
+            50    0.045    0.001    0.567    0.011 model.py:23(forward)
+           100    0.034    0.000    0.456    0.005 utils.py:12(log_system_metrics)
+```
+
+#### Key Metrics Explained
+- `ncalls`: Number of times the function was called
+- `tottime`: Total time spent in the function (excluding subcalls)
+- `percall`: Average time per call (tottime/ncalls)
+- `cumtime`: Cumulative time including subcalls
+- `percall`: Average time per call including subcalls (cumtime/ncalls)
+
 To analyze the profiling results:
 ```bash
-# Using pstats
+# Using pstats (built-in Python profiler analysis tool)
 python -m pstats training_profile.prof
 
-# Using snakeviz (requires installation)
-snakeviz training_profile.prof
-```
+
+The profiling results are automatically saved to `training_profile.prof` after each training run, and the top 20 time-consuming functions are displayed in the console output.
 
 ### Development Setup
 
@@ -138,22 +153,13 @@ mypy .
 
 ### Docker Setup
 
-#### GPU Version (with CUDA support)
-```bash
-# Build and run with GPU support
-docker-compose up --build
-
-# Run specific commands
-docker-compose run citegraph python src/models/model1/train.py
-```
-
 #### CPU Version (without GPU)
 ```bash
 # Build and run without GPU
-docker-compose -f docker-compose.cpu.yml up --build
+docker-compose -f docker-compose.yml up --build
 
 # Run specific commands
-docker-compose -f docker-compose.cpu.yml run citegraph python src/models/model1/train.py
+docker-compose -f docker-compose.yml run citegraph python src/models/model1/train.py
 ```
 
 #### Docker Commands
