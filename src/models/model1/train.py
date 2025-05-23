@@ -7,19 +7,33 @@ import torch.nn.functional as F
 from dataloader import Dataset
 from model import GCN
 from rich import print
+import random
+import numpy as np
+
+import hydra
+from omegaconf import DictConfig, OmegaConf
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
 if "logs" not in os.listdir():
     os.mkdir("logs")
 FORMAT = '%(asctime)s | %(levelname)s | %(message)s'
-logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=logging.INFO)
+#logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=logging.INFO)
+formatter = logging.Formatter(FORMAT)
+file_handler = logging.FileHandler(f"{log_dir}/citegraph_train.log")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.propagate = False
 
 class Trainer:
-    def __init__(self, data_path, epochs = 5000, model_save_freq = 1000, print_stats_freq = 50):
-        self._epochs = epochs
-        self._model_save_freq = model_save_freq
-        self._print_stats_freq = print_stats_freq
+    def __init__(self, cfg):
+        torch.manual_seed(cfg.seed)
+        random.seed(cfg.seed)
+        np.random.seed(cfg.seed)
+        self._epochs = cfg.epochs
+        self._model_save_freq = cfg.model_save_freq
+        self._print_stats_freq = cfg.print_stats_freq
 
         self._embeddings_over_time = []
 
@@ -30,14 +44,14 @@ class Trainer:
         self._file = open('training_results.csv', 'w')
         self._csv_writer = csv.writer(self._file)
 
-        self.__intialize_objects(data_path)
+        self.__intialize_objects(cfg.data_path, cfg.hidden_dim, cfg.lr)
 
-    def __intialize_objects(self, data_path):
+    def __intialize_objects(self, data_path, hidden_dim, lr):
         dataloader = Dataset()
         dataset = dataloader.load_cora(data_path)
         self.data = dataset[0]
-        self.model = GCN(dataset.num_node_features, 717, dataset.num_classes)
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
+        self.model = GCN(dataset.num_node_features, hidden_dim, dataset.num_classes)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr, weight_decay=5e-4)
 
         self.__move_to_device()
 
@@ -109,12 +123,16 @@ class Trainer:
     def __cleanup(self):
         self._file.close()
 
-if __name__ == "__main__":
-    epochs = 5000
-    model_save_freq = 1000
-    print_stats_freq = 50
-
-    data_path = "../../data/"
-    
-    trainer_obj = Trainer(data_path, epochs, model_save_freq, print_stats_freq)
+@hydra.main(version_base=None, config_path="confs", config_name="training_conf")
+def main(cfg):
+    logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
+    trainer_obj = Trainer(cfg)
     trainer_obj.train()
+
+if __name__ == "__main__":
+    # epochs = 5000
+    # model_save_freq = 1000
+    # print_stats_freq = 50
+
+    # data_path = "../../data/"
+    main()
