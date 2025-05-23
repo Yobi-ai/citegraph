@@ -13,4 +13,4 @@ services:
     environment:
       - MODEL_PATH=/app/models/model_5000.pth
       - DATA_PATH=/app/data/processed
-    command: python src/models/model1/inference.py 
+    command: python src/models/model1/train.py 
