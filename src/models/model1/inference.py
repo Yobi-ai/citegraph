@@ -1,6 +1,5 @@
 import logging
 import os
-
 import torch
 from dataloader import Dataset
 from model import GCN, Model
@@ -18,7 +17,7 @@ logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=lo
 class Inference:
     def __init__(self, model_path: str, data_path: str):
         self._model = Model(model_path)
-        self._data = Dataset().load_cora(data_path)
+        self._data = Dataset().load_cora(data_path)[0]
         self._label_dict = {
             0: "Theory",
             1: "Reinforcement_Learning",

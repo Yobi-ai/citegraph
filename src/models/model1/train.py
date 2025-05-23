@@ -1,11 +1,22 @@
+import csv
+import logging
+import os
+
 import torch
 import torch.nn.functional as F
 from dataloader import Dataset
 from model import GCN
+from rich import print
 
+logger = logging.getLogger(__name__)
+log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
+if "logs" not in os.listdir():
+    os.mkdir("logs")
+FORMAT = '%(asctime)s | %(levelname)s | %(message)s'
+logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=logging.INFO)
 
 class Trainer:
-    def __init__(self, epochs = 5000, model_save_freq = 1000, print_stats_freq = 50):
+    def __init__(self, data_path, epochs = 5000, model_save_freq = 1000, print_stats_freq = 50):
         self._epochs = epochs
         self._model_save_freq = model_save_freq
         self._print_stats_freq = print_stats_freq
@@ -16,13 +27,16 @@ class Trainer:
         self._val_loss_over_time = []
         self._train_acc_over_time = []
         self._val_acc_over_time = []
+        self._file = open('training_results.csv', 'w')
+        self._csv_writer = csv.writer(self._file)
 
-        self.__intialize_objects()
+        self.__intialize_objects(data_path)
 
-    def __intialize_objects(self):
+    def __intialize_objects(self, data_path):
         dataloader = Dataset()
-        self.data = dataloader.load_cora()
-        self.model = GCN(self.data.num_node_features, 717, self.data.num_classes)
+        dataset = dataloader.load_cora(data_path)
+        self.data = dataset[0]
+        self.model = GCN(dataset.num_node_features, 717, dataset.num_classes)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
 
         self.__move_to_device()
@@ -31,18 +45,20 @@ class Trainer:
         self._device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model.to(self._device)
         self.data.to(self._device)
+        logger.info(f"Device: {self._device}")
+        print(f"Device: [cyan]{self._device}[/cyan]")
     
-    def __train_epoch(self):
-        self.model.train()
-        self.optimizer.zero_grad()
-        out = self.model(self.data.x, self.data.edge_index)
+    def __train_epoch(self, model, optimizer):
+        model.train()
+        optimizer.zero_grad()
+        out = model(self.data.x, self.data.edge_index)
         loss = F.nll_loss(out[self.data.train_mask], self.data.y[self.data.train_mask])
         loss.backward()
-        self.optimizer.step()
+        optimizer.step()
         return loss.item()
     
     def __validate_epoch(self, model):
-        self.model.eval()
+        model.eval()
         with torch.no_grad():
             out = model(self.data.x, self.data.edge_index)
         val_loss = F.nll_loss(out[self.data.val_mask], self.data.y[self.data.val_mask]).item()
@@ -58,19 +74,47 @@ class Trainer:
         return self._train_loss_over_time, self._train_acc_over_time, self._val_loss_over_time, self._val_acc_over_time
     
     def train(self):
-        for epoch in range(1, self._epochs + 1):
-            train_loss = self.__train_epoch(self.model)
-            val_loss, acc, embeddings = self.__validate_epoch(self.model)
-            #embeddings_over_time.append(embeddings)
-            train_acc, val_acc = acc
-            self._train_loss_over_time.append(train_loss)
-            self._val_loss_over_time.append(val_loss)
-            self._train_acc_over_time.append(train_acc)
-            self._val_acc_over_time.append(val_acc)
-            if epoch % self._print_stats_freq == 0:
-                print(f'Epoch: {epoch:03d}, '
-                    f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
-                    f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}')
-            if epoch % self._model_save_freq == 0:
-                print(f'Saving model at epoch {epoch}')
-                torch.save(self.model, f'./model_{epoch}.pth')
+        print("Starting Training")
+        logger.info("Starting Training")
+        try:
+            for epoch in range(1, self._epochs + 1):
+                train_loss = self.__train_epoch(self.model, self.optimizer)
+                val_loss, acc, embeddings = self.__validate_epoch(self.model)
+                #embeddings_over_time.append(embeddings)
+                train_acc, val_acc = acc
+                self._train_loss_over_time.append(train_loss)
+                self._val_loss_over_time.append(val_loss)
+                self._train_acc_over_time.append(train_acc)
+                self._val_acc_over_time.append(val_acc)
+                self._csv_writer.writerow([train_loss, train_acc, val_loss, val_acc])
+                if epoch % self._print_stats_freq == 0:
+                    print(f'[yellow]Epoch: {epoch:03d}, '
+                        f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
+                        f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]')
+                    logger.info(f'Epoch: {epoch:03d}, '
+                        f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
+                        f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}')
+                if epoch % self._model_save_freq == 0:
+                    print(f'Saving model at [green]epoch {epoch}[/green]')
+                    logger.info(f'Saving model at epoch {epoch}')
+                    torch.save(self.model, f'./model_{epoch}.pth')
+            print("[bold green]Training Completed Successfully![/bold green]")
+            logger.info("Training Completed Successfully!")
+        
+        except KeyboardInterrupt:
+            print("Keyboard Interrupt\n[bold red]Stopping Training![/bold red]")
+            logger.info("Keyboard Interrupt\nStopping Training!")
+        self.__cleanup()
+
+    def __cleanup(self):
+        self._file.close()
+
+if __name__ == "__main__":
+    epochs = 5000
+    model_save_freq = 1000
+    print_stats_freq = 50
+
+    data_path = "../../data/"
+    
+    trainer_obj = Trainer(data_path, epochs, model_save_freq, print_stats_freq)
+    trainer_obj.train()

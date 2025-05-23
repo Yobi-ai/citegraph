@@ -21,4 +21,4 @@ class Dataset:
         self.dataset = Planetoid(root=data_path, name='Cora', transform=NormalizeFeatures())
         logger.info('Dataset Loaded')
         print("[bold green]Dataset Loaded Successfully[/bold green]")
-        return self.dataset[0]
+        return self.dataset
