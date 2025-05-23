@@ -220,8 +220,8 @@ mypy .
 ### Code Debugging
 - The code was debugged using the built in debugger, breakpoint and step-over functionality of VS code.
 - Some Debugging Scenarios include:
-  -- Figuring out faults in configuration management: Fixed using output logs and break points helping to see which configuration was being taken.
-  -- Path issues: Issues with importing modules on a higher level. Fixed using sys library and setting higher directory as root at that moment.
+ - Figuring out faults in configuration management: Fixed using output logs and break points helping to see which configuration was being taken.
+ - Path issues: Issues with importing modules on a higher level. Fixed using sys library and setting higher directory as root at that moment.
 
 ## 6. Contribution Summary
 - [ ] Briefly describe each team member's contributions
