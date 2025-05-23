@@ -1,10 +1,13 @@
+import cProfile
 import csv
 import logging
 import os
+import pstats
 import sys
 from pathlib import Path
 
 import random
+
 import hydra
 import numpy as np
 import torch
@@ -27,7 +30,6 @@ log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
 if "logs" not in os.listdir():
     os.mkdir("logs")
 FORMAT = '%(asctime)s | %(levelname)s | %(message)s'
-#logging.basicConfig(filename=f"{log_dir}/citegraph.log", format=FORMAT, level=logging.INFO)
 formatter = logging.Formatter(FORMAT)
 file_handler = logging.FileHandler(f"{log_dir}/citegraph_train.log")
 file_handler.setLevel(logging.DEBUG)
@@ -102,8 +104,12 @@ class Trainer:
     def train(self):
         print("Starting Training")
         logger.info("Starting Training")
-
-        mlflow.pytorch.autolog()
+        
+        #mlflow.pytorch.autolog()
+        
+        # Create a Profile object
+        profiler = cProfile.Profile()
+        profiler.enable()
         
         with mlflow.start_run(run_name="gcn-train"):
             try:
@@ -148,6 +154,19 @@ class Trainer:
                 print("Keyboard Interrupt\n[bold red]Stopping Training![/bold red]")
                 logger.info("Keyboard Interrupt\nStopping Training!")
                 print(f"mlflow run ID: {mlflow.active_run().info.run_id}")
+            
+            finally:
+              # Disable profiler and save results
+              profiler.disable()
+              stats = pstats.Stats(profiler)
+              stats.sort_stats('cumulative')
+              stats.dump_stats('training_profile.prof')
+              print("[bold green]Profiling results saved to training_profile.prof[/bold green]")
+              logger.info("Profiling results saved to training_profile.prof")
+
+              # Print top 20 time-consuming functions
+              print("\n[bold cyan]Top 20 Time-Consuming Functions:[/bold cyan]")
+              stats.strip_dirs().sort_stats('cumulative').print_stats(20)
         
         self.__cleanup()
 
@@ -162,9 +181,4 @@ def main(cfg):
     trainer_obj.train()
 
 if __name__ == "__main__":
-    # epochs = 5000
-    # model_save_freq = 1000
-    # print_stats_freq = 50
-
-    # data_path = "../../data/"
     main()

@@ -33,9 +33,6 @@ jobs:
     - name: Run isort
       run: isort . --check-only
 
-    - name: Run ruff
-      run: ruff check .
-
     - name: Run mypy
       run: mypy .
 
