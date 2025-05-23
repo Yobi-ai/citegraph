@@ -9,9 +9,9 @@
 
 ## 2. Monitoring & Debugging
 
-- [ ] **2.1 Debugging Practices**
-  - [ ] Debugging tools used (e.g., pdb)
-  - [ ] Example debugging scenarios and solutions
+- [✓] **2.1 Debugging Practices**
+  - [✓] Debugging tools used (e.g., pdb)
+  - [✓] Example debugging scenarios and solutions
 
 ## 3. Profiling & Optimization
 - [✓] **3.1 Profiling Scripts**
@@ -20,9 +20,9 @@
 
 ## 4. Experiment Management & Tracking
 - [✓] **4.1 Experiment Tracking Tools**
-  - [ ] MLflow, Weights & Biases, or similar integrated
+  - [✓] MLflow, Weights & Biases, or similar integrated
   - [✓] Logging of metrics, parameters, and models
-  - [ ] Instructions for visualizing and comparing runs
+  - [✓] Instructions for visualizing and comparing runs
 
 ## 5. Application & Experiment Logging
 - [✓] **5.1 Logging Setup**
