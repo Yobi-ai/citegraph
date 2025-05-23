@@ -1,11 +1,12 @@
+import csv
+import logging
+import os
+
 import torch
 import torch.nn.functional as F
 from dataloader import Dataset
 from model import GCN
-import logging
 from rich import print
-import os
-import csv
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
@@ -90,9 +91,9 @@ class Trainer:
                     print(f'[yellow]Epoch: {epoch:03d}, '
                         f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
                         f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]')
-                    logger.info(f'[yellow]Epoch: {epoch:03d}, '
+                    logger.info(f'Epoch: {epoch:03d}, '
                         f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
-                        f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]')
+                        f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}')
                 if epoch % self._model_save_freq == 0:
                     print(f'Saving model at [green]epoch {epoch}[/green]')
                     logger.info(f'Saving model at epoch {epoch}')
