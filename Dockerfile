@@ -1,16 +1,16 @@
 # Use Python base image
 FROM python:3.11-slim
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
     MODEL_PATH=/app/models/model_5000.pth \
     DATA_PATH=/app/data/processed
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
