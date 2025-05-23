@@ -1,6 +1,8 @@
-import psutil
-import time
 import os
+import time
+
+import psutil
+
 
 def get_cpu_usage():
     return psutil.cpu_percent()
