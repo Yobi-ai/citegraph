@@ -15,12 +15,14 @@ Citation Network
         CiteGraph is a GNN based system for classifying research papers into topics using the structure and content of a citation network.
         It uses node features and edge connections to improve classification performance.
 - [ ] Problem statement and motivation:
-
+        The project aims to develop an efficient and accurate system for classifying academic papers based on their citation networks and content.
+        By leveraging graph neural networks, we can capture both the structural relationships between papers and their content features.
 - [ ] Main objectives:
         - Build a reproducible ML pipeline for classifying nodes in a citation network.
         - Use graph-based models (GCN/GAT) for semi-supervised node classification.
         - Integrate open-source tooling (StellarGraph + MLflow) into a sustainable MLOps workflow.
         - Track experiments and version control collaboratively using Git and Cookiecutter.
+        - Implement performance profiling and monitoring for model training and inference.
 
 ## 3. Project Architecture Diagram
 ![MLOps Architecture](reports/figures/architecturemlops.png)
@@ -60,15 +62,46 @@ pip install -r requirements.txt
 ### Project Dependencies
 The project uses the following main dependencies:
 - PyTorch (~=2.5)
-- TensorFlow (~=2.18)
 - PyTorch Geometric (~=2.5)
 - NetworkX (~=3.4)
 - scikit-learn (~=1.6)
 - isort (==6.0.1)
 - ruff (==0.11.8)
+- mypy (==1.15.0)
+- click (==8.1.8)
+- python-dotenv (==0.9.9)
+- psutil (==5.9.8)
+- rich (==13.9)
+- hydra-core (~=1.3)
 
 ### Running the Code
 
+1. Training the model:
+```bash
+python src/models/model1/train.py
+```
+
+2. Running inference:
+```bash
+python src/models/model1/inference.py
+```
+
+### Performance Profiling
+
+The project includes built-in performance profiling using Python's cProfile. During training, the profiler will:
+- Track function call counts and execution times
+- Generate a detailed profile report (training_profile.prof)
+- Display the top 20 time-consuming functions
+- Save profiling results for later analysis
+
+To analyze the profiling results:
+```bash
+# Using pstats
+python -m pstats training_profile.prof
+
+# Using snakeviz (requires installation)
+snakeviz training_profile.prof
+```
 
 ### Development Setup
 
@@ -87,20 +120,21 @@ mypy .
 ## 6. Contribution Summary
 - [ ] Briefly describe each team member's contributions
 
-        Alen: Setting up the workflow, Architecure diagram, Linting, formatting tools setup with git actions, proposal documentation.
+        Alen: Setting up the workflow, Architecture diagram, Linting, formatting tools setup with git actions, proposal documentation.
 
-        Sujay: Environment, requirements, model piplines, data versioning, model training and evaluation, proposal documentation.
+        Sujay: Environment, requirements, model pipelines, data versioning, model training and evaluation, proposal documentation.
 
 ## 7. References
 - [ ] List of datasets, frameworks, and major third-party tools used
         - Python 3.11
-        - Pytorch
-        - Pytorch Geometric
+        - PyTorch
+        - PyTorch Geometric
         - MLflow
         - scikit-learn
         - matplotlib
         - numpy
         - pandas
+        - cProfile (for performance profiling)
 
 ### Docker Setup
 
