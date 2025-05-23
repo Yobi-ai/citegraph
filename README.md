@@ -115,7 +115,7 @@ print(f'[yellow]Epoch: {epoch:03d}, '
 print("[bold green]Training Completed Successfully![/bold green]")
 ```
 - Example for Rich:
-![alt text]([https://github.com/Yobi-ai/citegraph/blob/main/images/rich_example.png "Rich Example")
+![Rich Example](images/rich_example.png)
 - These show how consistently the script is running without faults and will help monitor if there are any faults or issues with the results.
 
 
