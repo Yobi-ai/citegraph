@@ -1,17 +1,16 @@
 import csv
 import logging
 import os
+import random
 
+import hydra
+import numpy as np
 import torch
 import torch.nn.functional as F
 from dataloader import Dataset
 from model import GCN
-from rich import print
-import random
-import numpy as np
-
-import hydra
 from omegaconf import DictConfig, OmegaConf
+from rich import print
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')

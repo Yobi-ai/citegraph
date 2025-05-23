@@ -1,14 +1,14 @@
 import logging
 import os
+
+import hydra
 import torch
 from dataloader import Dataset
 from model import GCN, Model
+from omegaconf import DictConfig, OmegaConf
 from rich import print
 from torch_geometric.datasets import Planetoid
 from torch_geometric.transforms import NormalizeFeatures
-
-import hydra
-from omegaconf import DictConfig, OmegaConf
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
