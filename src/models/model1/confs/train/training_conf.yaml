@@ -1,0 +1,13 @@
+defaults:
+  - experiment: full_train
+  - override experiment: test_train
+  - _self_
+
+data_path: "../../data/"
+hidden_dim: 400
+lr: 0.001
+epochs: 5000
+seed: 42
+
+model_save_freq: 1000
+print_stats_freq: 50
