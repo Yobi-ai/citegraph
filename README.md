@@ -23,11 +23,51 @@ Citation Network
         often ignored by traditional text classification models.
 
 - [ ] Main objectives:
-        - Build a reproducible ML pipeline for classifying nodes in a citation network.
-        - Use graph-based models (GCN/GAT) for semi-supervised node classification.
-        - Integrate open-source tooling (PyTorch Geometric + MLflow) into a sustainable MLOps workflow.
-        - Track experiments and version control collaboratively using Git and Cookiecutter.
+        - Build a reproducible ML pipeline that can classify nodes in a citation network
+        - Use graph-based models like GAT, GCN for node classification
+        - Integrate open-source tools like PyTorch Geometric and MLflow into the workflow
         - Implement performance profiling and monitoring for model training and inference.
+        - Track experiments and version control collaboratively using git, DVC etc.
+
+### Success Metrics
+The success metrics are divided into two parts:
+
+1. Model Training Metrics:
+   - Negative log likelihood loss
+   - Accuracy
+
+2. CI/CD Pipeline Metrics:
+   - Reproducibility: The entire pipeline will be reproducible
+   - Reliability: The system will be reliable and have fault tolerance
+
+### Dataset Selection
+We have chosen the Cora dataset as it is a standard benchmark for graph-based learning models:
+- Contains 2708 ML research papers
+- Classified into 7 topic categories
+- Over 5429 citation edges
+- Each paper has a 1433-dimensional binary feature vector
+- Publicly available through PyTorch Geometric library
+
+### Model Architecture
+Currently implemented:
+- Graph Convolutional Networks (GCN) - achieving up to 79% accuracy on test subset
+- Planned: Graph Attention Networks (GAT) for comparison
+
+### Open-source Tools
+Core ML:
+- PyTorch Geometric: Extension of PyTorch for handling graph-structured data
+- NetworkX: For graph manipulation and analysis
+- scikit-learn: For data preprocessing and model evaluation
+
+Development & Code Quality:
+- isort: For import sorting
+- ruff: Fast Python linter and formatter
+- mypy: For static type checking
+
+Additional Dependencies:
+- matplotlib: For data visualization
+- numpy: For numerical operations
+- pandas: For data manipulation
 
 ## 3. Project Architecture Diagram
 ![MLOps Architecture](reports/figures/architecturemlops.png)
