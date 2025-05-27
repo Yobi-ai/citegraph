@@ -13,10 +13,15 @@ Citation Network
 ## 2. Project Overview
 - [ ] Brief summary of the project (2-3 sentences):
         CiteGraph is a GNN based system for classifying research papers into topics using the structure and content of a citation network.
-        It uses node features and edge connections to improve classification performance.
+        It uses node features and edge connections to improve classification performance over traditional NLP methods.
+
 - [ ] Problem statement and motivation:
-        The project aims to develop an efficient and accurate system for classifying academic papers based on their citation networks and content.
-        By leveraging graph neural networks, we can capture both the structural relationships between papers and their content features.
+        Traditional NLP methods classify papers solely on content, ignoring rich interconnections that exist between them. 
+        Our project explores how graph-based learning can often outperform these traditional methods and how to set up a fully 
+        functioning pipeline to integrate, deploy and reproduce the outcome. Citation networks have been found to prove meaningful 
+        relations between documents in academic research papers. These relations often indicate similarities in topics, which are 
+        often ignored by traditional text classification models.
+
 - [ ] Main objectives:
         - Build a reproducible ML pipeline for classifying nodes in a citation network.
         - Use graph-based models (GCN/GAT) for semi-supervised node classification.
