@@ -436,11 +436,12 @@ scikit-learn: Provides tools for data preprocessing, model evaluation, and tradi
 **Development & Code Quality:-**
 **isort:** Automatically sorts Python imports alphabetically and by type. Ensures consistent import ordering across the codebase.
 **ruff:** fast Python linter and formatter. Used for maintaining code quality and enforcing style guidelines.
-**mypy:** for static type checking
+**mypy:** for static type checking.
 
 **Additional Dependencies:-**
 **matplotlib:** Used for data visualization and plotting results.
 **numpy:** Provides efficient numerical operations and array manipulations.
+
 --------
 <p><small>Project based on the <a target="_blank" href="https://github.com/Chim-SO/cookiecutter-mlops/">cookiecutter MLOps project template</a>
 that is originally based on <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. 
