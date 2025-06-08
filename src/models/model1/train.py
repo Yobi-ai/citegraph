@@ -3,33 +3,33 @@ import csv
 import logging
 import os
 import pstats
+import random
 import sys
 from pathlib import Path
 
-import random
-
 import hydra
+import mlflow
 import numpy as np
 import torch
 import torch.nn.functional as F
 from dataloader import Dataset
 from model import GCN
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import OmegaConf
 from rich import print
-import mlflow
+
+from utils.monitor import log_system_metrics
 
 # Add src directory to Python path
 src_path = str(Path(__file__).parent.parent.parent)
 if src_path not in sys.path:
     sys.path.append(src_path)
 
-from utils.monitor import log_system_metrics
 
 logger = logging.getLogger(__name__)
-log_dir = os.path.join(os.path.normpath(os.getcwd()), 'logs')
+log_dir = os.path.join(os.path.normpath(os.getcwd()), "logs")
 if "logs" not in os.listdir():
     os.mkdir("logs")
-FORMAT = '%(asctime)s | %(levelname)s | %(message)s'
+FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
 formatter = logging.Formatter(FORMAT)
 file_handler = logging.FileHandler(f"{log_dir}/citegraph_train.log")
 file_handler.setLevel(logging.DEBUG)
@@ -39,6 +39,7 @@ logger.propagate = False
 
 mlflow.set_tracking_uri("file:./mlruns")
 mlflow.set_experiment("citegraph")
+
 
 class Trainer:
     def __init__(self, cfg):
@@ -55,7 +56,7 @@ class Trainer:
         self._val_loss_over_time = []
         self._train_acc_over_time = []
         self._val_acc_over_time = []
-        self._file = open('training_results.csv', 'w')
+        self._file = open("training_results.csv", "w")
         self._csv_writer = csv.writer(self._file)
 
         self.__intialize_objects(cfg.data_path, cfg.hidden_dim, cfg.lr)
@@ -65,17 +66,19 @@ class Trainer:
         dataset = dataloader.load_cora(data_path)
         self.data = dataset[0]
         self.model = GCN(dataset.num_node_features, hidden_dim, dataset.num_classes)
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr, weight_decay=5e-4)
+        self.optimizer = torch.optim.Adam(
+            self.model.parameters(), lr=lr, weight_decay=5e-4
+        )
 
         self.__move_to_device()
 
     def __move_to_device(self):
-        self._device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self._device)
         self.data.to(self._device)
         logger.info(f"Device: {self._device}")
         print(f"Device: [cyan]{self._device}[/cyan]")
-    
+
     def __train_epoch(self, model, optimizer):
         model.train()
         optimizer.zero_grad()
@@ -84,12 +87,14 @@ class Trainer:
         loss.backward()
         optimizer.step()
         return loss.item()
-    
+
     def __validate_epoch(self, model):
         model.eval()
         with torch.no_grad():
             out = model(self.data.x, self.data.edge_index)
-        val_loss = F.nll_loss(out[self.data.val_mask], self.data.y[self.data.val_mask]).item()
+        val_loss = F.nll_loss(
+            out[self.data.val_mask], self.data.y[self.data.val_mask]
+        ).item()
         pred = out.argmax(dim=1)
         embeddings = out.cpu().detach()
         accs = []
@@ -97,81 +102,95 @@ class Trainer:
             correct = pred[mask].eq(self.data.y[mask]).sum().item()
             accs.append(correct / mask.sum().item())
         return val_loss, accs, embeddings
-    
+
     def get_full_training_results(self):
-        return self._train_loss_over_time, self._train_acc_over_time, self._val_loss_over_time, self._val_acc_over_time
-    
+        return (
+            self._train_loss_over_time,
+            self._train_acc_over_time,
+            self._val_loss_over_time,
+            self._val_acc_over_time,
+        )
+
     def train(self):
         print("Starting Training")
         logger.info("Starting Training")
-        
-        #mlflow.pytorch.autolog()
-        
+
+        # mlflow.pytorch.autolog()
+
         # Create a Profile object
         profiler = cProfile.Profile()
         profiler.enable()
-        
+
         with mlflow.start_run(run_name="gcn-train"):
             try:
                 for epoch in range(1, self._epochs + 1):
                     train_loss = self.__train_epoch(self.model, self.optimizer)
                     val_loss, acc, embeddings = self.__validate_epoch(self.model)
-                    #embeddings_over_time.append(embeddings)
+                    # embeddings_over_time.append(embeddings)
                     train_acc, val_acc = acc
-                    
+
                     self._train_loss_over_time.append(train_loss)
                     self._val_loss_over_time.append(val_loss)
                     self._train_acc_over_time.append(train_acc)
                     self._val_acc_over_time.append(val_acc)
-                    self._csv_writer.writerow([epoch, train_loss, train_acc, val_loss, val_acc])
-                    
+                    self._csv_writer.writerow(
+                        [epoch, train_loss, train_acc, val_loss, val_acc]
+                    )
+
                     mlflow.log_metric("train_loss", train_loss)
                     mlflow.log_metric("train_accuracy", train_acc)
                     mlflow.log_metric("val_loss", val_loss)
                     mlflow.log_metric("val_accuracy", val_acc)
 
                     log_system_metrics(epoch)
-                    
+
                     if epoch % self._print_stats_freq == 0:
-                        print(f'[yellow]Epoch: {epoch:03d}, '
-                            f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
-                            f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]')
-                        logger.info(f'Epoch: {epoch:03d}, '
-                            f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
-                            f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}')
-                    
+                        print(
+                            f"[yellow]Epoch: {epoch:03d}, "
+                            f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, "
+                            f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]"
+                        )
+                        logger.info(
+                            f"Epoch: {epoch:03d}, "
+                            f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, "
+                            f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}"
+                        )
+
                     if epoch % self._model_save_freq == 0:
-                        print(f'Saving model at [green]epoch {epoch}[/green]')
-                        logger.info(f'Saving model at epoch {epoch}')
-                        torch.save(self.model, f'./model_{epoch}.pth')
-                        mlflow.pytorch.log_model(self.model, f'model_{epoch}')
-                
+                        print(f"Saving model at [green]epoch {epoch}[/green]")
+                        logger.info(f"Saving model at epoch {epoch}")
+                        torch.save(self.model, f"./model_{epoch}.pth")
+                        mlflow.pytorch.log_model(self.model, f"model_{epoch}")
+
                 print("[bold green]Training Completed Successfully![/bold green]")
                 logger.info("Training Completed Successfully!")
                 print(f"mlflow run ID: {mlflow.active_run().info.run_id}")
-            
+
             except KeyboardInterrupt:
                 print("Keyboard Interrupt\n[bold red]Stopping Training![/bold red]")
                 logger.info("Keyboard Interrupt\nStopping Training!")
                 print(f"mlflow run ID: {mlflow.active_run().info.run_id}")
-            
-            finally:
-              # Disable profiler and save results
-              profiler.disable()
-              stats = pstats.Stats(profiler)
-              stats.sort_stats('cumulative')
-              stats.dump_stats('training_profile.prof')
-              print("[bold green]Profiling results saved to training_profile.prof[/bold green]")
-              logger.info("Profiling results saved to training_profile.prof")
 
-              # Print top 20 time-consuming functions
-              print("\n[bold cyan]Top 20 Time-Consuming Functions:[/bold cyan]")
-              stats.strip_dirs().sort_stats('cumulative').print_stats(20)
-        
+            finally:
+                # Disable profiler and save results
+                profiler.disable()
+                stats = pstats.Stats(profiler)
+                stats.sort_stats("cumulative")
+                stats.dump_stats("training_profile.prof")
+                print(
+                    "[bold green]Profiling results saved to training_profile.prof[/bold green]"
+                )
+                logger.info("Profiling results saved to training_profile.prof")
+
+                # Print top 20 time-consuming functions
+                print("\n[bold cyan]Top 20 Time-Consuming Functions:[/bold cyan]")
+                stats.strip_dirs().sort_stats("cumulative").print_stats(20)
+
         self.__cleanup()
 
     def __cleanup(self):
         self._file.close()
+
 
 @hydra.main(version_base=None, config_path="confs/train", config_name="training_conf")
 def main(cfg):
@@ -179,6 +198,7 @@ def main(cfg):
     print(f"[yellow]Configuration:\n{OmegaConf.to_yaml(cfg)}[/yellow]")
     trainer_obj = Trainer(cfg)
     trainer_obj.train()
+
 
 if __name__ == "__main__":
     main()
