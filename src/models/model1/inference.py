@@ -1,9 +1,10 @@
 import logging
 import os
+from typing import Dict, Tuple
 
 import hydra
 import torch
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from rich import print
 
 from .dataloader import Dataset
@@ -24,10 +25,10 @@ logger.propagate = False
 
 
 class Inference:
-    def __init__(self, cfg):
+    def __init__(self, cfg: DictConfig) -> None:
         self._model = Model(cfg.model_path)
         self._data = Dataset().load_cora(cfg.data_path)[0]
-        self._label_dict = {
+        self._label_dict: Dict[int, str] = {
             0: "Theory",
             1: "Reinforcement_Learning",
             2: "Genetic_Algorithms",
@@ -37,15 +38,15 @@ class Inference:
             6: "Rule_Learning",
         }
 
-    def run_sample(self, idx: int) -> tuple[int, str]:
+    def run_sample(self, idx: int) -> Tuple[int, str]:
         logger.info("Starting Prediction")
         self._model.eval()
         with torch.no_grad():
             out = self._model(self._data.x, self._data.edge_index)
             pred = out.argmax(dim=1)
 
-        pred_idx = pred[idx].item()
-        pred_label = self._label_dict[pred[idx].item()]
+        pred_idx = int(pred[idx].item())
+        pred_label = self._label_dict[pred_idx]
 
         logger.info(f"Predicted: {pred_label}")
         print(f"Prediction:- \n- [bold green]{pred_idx}: {pred_label}[/bold green]")
@@ -56,7 +57,7 @@ class Inference:
 @hydra.main(
     version_base=None, config_path="confs/inference", config_name="inference_conf"
 )
-def main(cfg):
+def main(cfg: DictConfig) -> None:
     logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
     inf_obj = Inference(cfg)
     print(inf_obj.run_sample(999))
