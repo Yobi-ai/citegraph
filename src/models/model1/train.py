@@ -13,18 +13,17 @@ import mlflow
 import numpy as np
 import torch
 import torch.nn.functional as F
+from dataloader import Dataset
+from model import GCN
 from omegaconf import DictConfig, OmegaConf
 from rich import print
 
-from dataloader import Dataset
-from model import GCN
+from utils.monitor import log_system_metrics
 
 # Add src directory to Python path
 src_path = str(Path(__file__).parent.parent.parent)
 if src_path not in sys.path:
     sys.path.append(src_path)
-
-from utils.monitor import log_system_metrics
 
 
 logger = logging.getLogger(__name__)
@@ -197,8 +196,8 @@ class Trainer:
 def main(cfg: DictConfig) -> None:
     logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
     print(f"[yellow]Configuration:\n{OmegaConf.to_yaml(cfg)}[/yellow]")
-    trainer_obj = Trainer(cfg)
-    trainer_obj.train()
+    trainer_objs = Trainer(cfg)
+    trainer_objs.train()
 
 
 if __name__ == "__main__":

@@ -24,6 +24,12 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
+RUN useradd -n appuser
+
+USER appuser
+
+EXPOSE 8001
+
 # Create necessary directories and ensure they exist
 RUN mkdir -p data/raw data/processed data/interim data/external \
     models \
@@ -36,4 +42,4 @@ RUN mkdir -p data/raw data/processed data/interim data/external \
     reports/figures/.gitkeep
 
 # Set default command
-CMD ["bash"] 
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
