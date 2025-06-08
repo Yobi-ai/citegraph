@@ -3,10 +3,11 @@ import os
 
 import hydra
 import torch
-from dataloader import Dataset
-from model import Model
 from omegaconf import OmegaConf
 from rich import print
+
+from .dataloader import Dataset
+from .model import Model
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), "logs")
