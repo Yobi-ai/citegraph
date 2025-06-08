@@ -6,23 +6,25 @@ import pstats
 import random
 import sys
 from pathlib import Path
+from typing import List, Tuple
 
 import hydra
 import mlflow
 import numpy as np
 import torch
 import torch.nn.functional as F
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from rich import print
 
-from ..utils.monitor import log_system_metrics
-from .dataloader import Dataset
-from .model import GCN
+from dataloader import Dataset
+from model import GCN
 
 # Add src directory to Python path
 src_path = str(Path(__file__).parent.parent.parent)
 if src_path not in sys.path:
     sys.path.append(src_path)
+
+from utils.monitor import log_system_metrics
 
 
 logger = logging.getLogger(__name__)
@@ -42,7 +44,7 @@ mlflow.set_experiment("citegraph")
 
 
 class Trainer:
-    def __init__(self, cfg):
+    def __init__(self, cfg: DictConfig) -> None:
         torch.manual_seed(cfg.seed)
         random.seed(cfg.seed)
         np.random.seed(cfg.seed)
@@ -50,18 +52,18 @@ class Trainer:
         self._model_save_freq = cfg.model_save_freq
         self._print_stats_freq = cfg.print_stats_freq
 
-        self._embeddings_over_time = []
+        self._embeddings_over_time: List[torch.Tensor] = []
 
-        self._train_loss_over_time = []
-        self._val_loss_over_time = []
-        self._train_acc_over_time = []
-        self._val_acc_over_time = []
+        self._train_loss_over_time: List[float] = []
+        self._val_loss_over_time: List[float] = []
+        self._train_acc_over_time: List[float] = []
+        self._val_acc_over_time: List[float] = []
         self._file = open("training_results.csv", "w")
         self._csv_writer = csv.writer(self._file)
 
         self.__intialize_objects(cfg.data_path, cfg.hidden_dim, cfg.lr)
 
-    def __intialize_objects(self, data_path, hidden_dim, lr):
+    def __intialize_objects(self, data_path: str, hidden_dim: int, lr: float) -> None:
         dataloader = Dataset()
         dataset = dataloader.load_cora(data_path)
         self.data = dataset[0]
@@ -72,23 +74,23 @@ class Trainer:
 
         self.__move_to_device()
 
-    def __move_to_device(self):
+    def __move_to_device(self) -> None:
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self._device)
         self.data.to(self._device)
         logger.info(f"Device: {self._device}")
         print(f"Device: [cyan]{self._device}[/cyan]")
 
-    def __train_epoch(self, model, optimizer):
+    def __train_epoch(self, model: GCN, optimizer: torch.optim.Optimizer) -> float:
         model.train()
         optimizer.zero_grad()
         out = model(self.data.x, self.data.edge_index)
         loss = F.nll_loss(out[self.data.train_mask], self.data.y[self.data.train_mask])
         loss.backward()
         optimizer.step()
-        return loss.item()
+        return float(loss.item())
 
-    def __validate_epoch(self, model):
+    def __validate_epoch(self, model: GCN) -> Tuple[float, List[float], torch.Tensor]:
         model.eval()
         with torch.no_grad():
             out = model(self.data.x, self.data.edge_index)
@@ -103,7 +105,9 @@ class Trainer:
             accs.append(correct / mask.sum().item())
         return val_loss, accs, embeddings
 
-    def get_full_training_results(self):
+    def get_full_training_results(
+        self,
+    ) -> Tuple[List[float], List[float], List[float], List[float]]:
         return (
             self._train_loss_over_time,
             self._train_acc_over_time,
@@ -111,22 +115,19 @@ class Trainer:
             self._val_acc_over_time,
         )
 
-    def train(self):
+    def train(self) -> None:
         print("Starting Training")
         logger.info("Starting Training")
-
-        # mlflow.pytorch.autolog()
 
         # Create a Profile object
         profiler = cProfile.Profile()
         profiler.enable()
 
-        with mlflow.start_run(run_name="gcn-train"):
+        with mlflow.start_run(run_name="gcn-train") as run:
             try:
                 for epoch in range(1, self._epochs + 1):
                     train_loss = self.__train_epoch(self.model, self.optimizer)
                     val_loss, acc, embeddings = self.__validate_epoch(self.model)
-                    # embeddings_over_time.append(embeddings)
                     train_acc, val_acc = acc
 
                     self._train_loss_over_time.append(train_loss)
@@ -164,12 +165,12 @@ class Trainer:
 
                 print("[bold green]Training Completed Successfully![/bold green]")
                 logger.info("Training Completed Successfully!")
-                print(f"mlflow run ID: {mlflow.active_run().info.run_id}")
+                print(f"mlflow run ID: {run.info.run_id}")
 
             except KeyboardInterrupt:
                 print("Keyboard Interrupt\n[bold red]Stopping Training![/bold red]")
                 logger.info("Keyboard Interrupt\nStopping Training!")
-                print(f"mlflow run ID: {mlflow.active_run().info.run_id}")
+                print(f"mlflow run ID: {run.info.run_id}")
 
             finally:
                 # Disable profiler and save results
@@ -188,12 +189,12 @@ class Trainer:
 
         self.__cleanup()
 
-    def __cleanup(self):
+    def __cleanup(self) -> None:
         self._file.close()
 
 
 @hydra.main(version_base=None, config_path="confs/train", config_name="training_conf")
-def main(cfg):
+def main(cfg: DictConfig) -> None:
     logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
     print(f"[yellow]Configuration:\n{OmegaConf.to_yaml(cfg)}[/yellow]")
     trainer_obj = Trainer(cfg)

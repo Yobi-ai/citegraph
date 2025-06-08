@@ -13,14 +13,61 @@ Citation Network
 ## 2. Project Overview
 - [ ] Brief summary of the project (2-3 sentences):
         CiteGraph is a GNN based system for classifying research papers into topics using the structure and content of a citation network.
-        It uses node features and edge connections to improve classification performance.
+        It uses node features and edge connections to improve classification performance over traditional NLP methods.
+
 - [ ] Problem statement and motivation:
+        Traditional NLP methods classify papers solely on content, ignoring rich interconnections that exist between them. 
+        Our project explores how graph-based learning can often outperform these traditional methods and how to set up a fully 
+        functioning pipeline to integrate, deploy and reproduce the outcome. Citation networks have been found to prove meaningful 
+        relations between documents in academic research papers. These relations often indicate similarities in topics, which are 
+        often ignored by traditional text classification models.
 
 - [ ] Main objectives:
-        - Build a reproducible ML pipeline for classifying nodes in a citation network.
-        - Use graph-based models (GCN/GAT) for semi-supervised node classification.
-        - Integrate open-source tooling (StellarGraph + MLflow) into a sustainable MLOps workflow.
-        - Track experiments and version control collaboratively using Git and Cookiecutter.
+        - Build a reproducible ML pipeline that can classify nodes in a citation network
+        - Use graph-based models like GAT, GCN for node classification
+        - Integrate open-source tools like PyTorch Geometric and MLflow into the workflow
+        - Implement performance profiling and monitoring for model training and inference.
+        - Track experiments and version control collaboratively using git, DVC etc.
+
+### Success Metrics
+The success metrics are divided into two parts:
+
+1. Model Training Metrics:
+   - Negative log likelihood loss
+   - Accuracy
+
+2. CI/CD Pipeline Metrics:
+   - Reproducibility: The entire pipeline will be reproducible
+   - Reliability: The system will be reliable and have fault tolerance
+
+### Dataset Selection
+We have chosen the Cora dataset as it is a standard benchmark for graph-based learning models:
+- Contains 2708 ML research papers
+- Classified into 7 topic categories
+- Over 5429 citation edges
+- Each paper has a 1433-dimensional binary feature vector
+- Publicly available through PyTorch Geometric library
+
+### Model Architecture
+Currently implemented:
+- Graph Convolutional Networks (GCN) - achieving up to 79% accuracy on test subset
+- Planned: Graph Attention Networks (GAT) for comparison
+
+### Open-source Tools
+Core ML:
+- PyTorch Geometric: Extension of PyTorch for handling graph-structured data
+- NetworkX: For graph manipulation and analysis
+- scikit-learn: For data preprocessing and model evaluation
+
+Development & Code Quality:
+- isort: For import sorting
+- ruff: Fast Python linter and formatter
+- mypy: For static type checking
+
+Additional Dependencies:
+- matplotlib: For data visualization
+- numpy: For numerical operations
+- pandas: For data manipulation
 
 ## 3. Project Architecture Diagram
 ![MLOps Architecture](reports/figures/architecturemlops.png)
@@ -60,15 +107,146 @@ pip install -r requirements.txt
 ### Project Dependencies
 The project uses the following main dependencies:
 - PyTorch (~=2.5)
-- TensorFlow (~=2.18)
 - PyTorch Geometric (~=2.5)
 - NetworkX (~=3.4)
 - scikit-learn (~=1.6)
 - isort (==6.0.1)
 - ruff (==0.11.8)
+- mypy (==1.15.0)
+- click (==8.1.8)
+- python-dotenv (==0.9.9)
+- psutil (==5.9.8)
+- rich (==13.9)
+- hydra-core (~=1.3)
 
 ### Running the Code
 
+1. Training the model:
+```bash
+python src/models/model1/train.py
+```
+
+2. Running inference:
+```bash
+python src/models/model1/inference.py
+```
+
+### Modifying Configurations
+- The configurations can be found at src/models/model1/confs/
+- 'train' for training configurations and 'inference' for inference configurations.
+
+### Checking mlflow dashboard:
+- After running the training script, run the following on the terminal:
+```bash
+mlflow ui
+```
+- This will give you a link that will show the training result of all runs.
+- We can select any runs from there and check the metrics and artifacts.
+
+### Logging
+- Python Logging module is used for logging all major events in a file along with timestamps.
+- Rich is used to beautifully represent the major events on the running terminal.
+- Example for File Logging:
+```bash
+2025-05-22 23:38:58,814 | INFO | Starting Training
+2025-05-22 23:39:07,637 | INFO | Epoch: 050, Train Loss: 0.9625, Train Acc: 0.9571, Val Loss: 1.3314, Val Acc: 0.7680
+2025-05-22 23:39:16,093 | INFO | Epoch: 100, Train Loss: 0.0896, Train Acc: 1.0000, Val Loss: 0.7218, Val Acc: 0.7920
+```
+- Rich is used in the follwing way:
+```bash
+print(f'[yellow]Epoch: {epoch:03d}, '
+        f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, '
+        f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}[/yellow]')
+print("[bold green]Training Completed Successfully![/bold green]")
+```
+- Example for Rich:
+![Rich Example](images/rich_example.png)
+- These show how consistently the script is running without faults and will help monitor if there are any faults or issues with the results.
+
+
+### Performance Profiling
+
+The project uses Python's built-in cProfile for performance profiling. During training, cProfile will:
+- Track function call counts and execution times
+- Generate a detailed profile report (training_profile.prof)
+- Display the top 20 time-consuming functions
+- Save profiling results for later analysis
+
+#### Profiling Output Format
+```
+          ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+---------------------------------------------------------------
+             1    0.123    0.123    1.234    1.234 train.py:45(__train_epoch)
+            50    0.045    0.001    0.567    0.011 model.py:23(forward)
+           100    0.034    0.000    0.456    0.005 utils.py:12(log_system_metrics)
+```
+
+#### Key Profiling Metrics Explained
+- `ncalls`: Number of times the function was called
+- `tottime`: Total time spent in the function (excluding subcalls)
+- `percall`: Average time per call (tottime/ncalls)
+- `cumtime`: Cumulative time including subcalls
+- `percall`: Average time per call including subcalls (cumtime/ncalls)
+
+To analyze the profiling results:
+```bash
+# Using pstats (built-in Python profiler analysis tool)
+python -m pstats training_profile.prof
+```
+
+The profiling results are automatically saved to `training_profile.prof` after each training run, and the top 20 time-consuming functions are displayed in the console output.
+
+### System Resource Monitoring
+
+The project uses psutil for system resource monitoring during training. This helps track resource usage and identify potential bottlenecks.
+
+#### Monitored Metrics
+
+1. CPU Metrics
+   - CPU usage percentage
+   - Total CPU time
+
+2. Memory Metrics
+   - Total system memory
+   - Used memory
+   - Memory usage in GB
+
+#### Resource Monitoring Output
+
+The system metrics are displayed in a simple format during training:
+```
+[Epoch 1] CPU: 45.2% | RAM: 2.5 / 16.0 GB
+```
+
+#### Usage in Code
+
+```python
+import psutil
+
+def get_cpu_usage():
+    return psutil.cpu_percent()
+
+def get_memory_usage():
+    mem = psutil.virtual_memory()
+    return mem.used / (1024 ** 3), mem.total / (1024 ** 3)
+
+def log_system_metrics(epoch=None):
+    cpu = get_cpu_usage()
+    used_mem, total_mem = get_memory_usage()
+    print(f"[Epoch {epoch}] CPU: {cpu}% | RAM: {used_mem:.2f} / {total_mem:.2f} GB")
+```
+
+#### Best Practices
+
+1. Resource Monitoring
+   - Monitor CPU usage during training
+   - Track memory consumption
+   - Log metrics at regular intervals
+
+2. Performance Optimization
+   - Adjust batch sizes based on memory usage
+   - Monitor CPU utilization for bottlenecks
+   - Use metrics to optimize data loading
 
 ### Development Setup
 
@@ -84,42 +262,60 @@ ruff check .
 mypy .
 ```
 
+### Code Debugging
+- The code was debugged using the built in debugger, breakpoint and step-over functionality of VS code.
+- Some Debugging Scenarios include:
+  - Figuring out faults in configuration management: Fixed using output logs and break points helping to see which configuration was being taken.
+  - Path issues: Issues with importing modules on a higher level. Fixed using sys library and setting higher directory as root at that moment.
+
 ## 6. Contribution Summary
 - [ ] Briefly describe each team member's contributions
 
-        Alen: Setting up the workflow, Architecure diagram, Linting, formatting tools setup with git actions, proposal documentation.
+        Alen:
+        - Setup project repository and initialised cookiecutter template. 
+        - Researched on project ideas and created the architecture diagram.
+        - Integrated linting and formatting tools with git actions. 
+        - Created proposal documentation.
+        - Created dockerfile and docker-compose.yml to build inference image
+        - Integrated psutil to log system usage metrics
+        - Integrated Cprofiler to create profile of funtions running and ouput to .prof file
+        - updated readme with necessary documentation.
 
-        Sujay: Environment, requirements, model piplines, data versioning, model training and evaluation, proposal documentation.
+        Sujay: 
+        - Setup the Environment and requirements
+        - Initialized data versioning
+        - Created Training Notebook
+        - Created the model training and inference pipelines
+        - Trained model
+        - Contributed to Proposal documentation.
+        - Implemented Experiment Tracking using mlflow.
+        - Implemented configuration management using Hydra.
+        - Implemented logging using python logging and rich.
 
 ## 7. References
 - [ ] List of datasets, frameworks, and major third-party tools used
-        - Python 3.11
-        - Pytorch
-        - Pytorch Geometric
-        - MLflow
-        - scikit-learn
-        - matplotlib
-        - numpy
-        - pandas
+      - Python 3.11
+      - Cora Dataset
+      - PyTorch
+      - PyTorch Geometric
+      - scikit-learn
+      - matplotlib
+      - numpy
+      - pandas
+      - cProfile (for performance profiling)
+      - mlflow
+      - Hydra
+      - Rich
 
 ### Docker Setup
-
-#### GPU Version (with CUDA support)
-```bash
-# Build and run with GPU support
-docker-compose up --build
-
-# Run specific commands
-docker-compose run citegraph python src/models/model1/train.py
-```
 
 #### CPU Version (without GPU)
 ```bash
 # Build and run without GPU
-docker-compose -f docker-compose.cpu.yml up --build
+docker-compose -f docker-compose.yml up --build
 
 # Run specific commands
-docker-compose -f docker-compose.cpu.yml run citegraph python src/models/model1/train.py
+docker-compose -f docker-compose.yml run citegraph python src/models/model1/train.py
 ```
 
 #### Docker Commands
@@ -183,6 +379,68 @@ citegraph/
         └── exploration.py       
 ```
 
+## 8. Project Proposal
+### 8.1 Project Scope and Objectives
+#### Problem Statement
+NLP methods that exist traditionally classify papers solely on content ignoring rich interconnections that exist between them. Our project explores how graph based learnings can often outperform these and how to set up a fully functioning pipeline to integrate, deploy and reproduce the outcome.
+
+#### Project Objectives and expected impact
+- To build a reproducible ML pipeline that can classify nodes in a citation network.
+- Use graph based models like GAT, GCN for node classification.
+- To integrate open source tools like Pytorch Geometric and MLflow into the workflow.
+- To track experiments and version control collaboratively using git, DVC etc.
+  
+#### Success Metrics
+The success metrics used in this project will be divided into two parts. The first part is the success metrics for the model training. Here the selected success metrics are negative log likelihood loss and accuracy. The negative log likelihood is good for classification problem such as this project. The second part is the CI/CD pipeline. Here we will be looking for reproducibility which means the entire pipeline will be reproducible and reliability which means the system will be reliable and have fault tolerance.
+
+#### Description:
+Citation networks have been found to prove meaningful relations between documents in academic research papers. These relations often indicate similarities in topics, which are often ignored by traditional text classification models. Our project aims to exploit this relation structure using Graph Neural Networks specifically GCN and GAT.
+
+We have chosen the Cora dataset, which consists of 2708 papers, each described by a sparse bag-of-words vector and labeled under one of seven categories. Edges represent the citation relation between papers. This graph structure is well suited for GNN’s which update each node’s representation by aggregation of features from its neighbours. We will work on both GCN and GAT.
+
+Our core framework would be Pytorch Geometric, an open source library that simplifies GNN implementations on Pytorch/Keras. It also provides built-in support for full batch training on citation networks, model wrappers for GCN and GAT and easily integrates with existing ML workflows.
+
+To track model configurations and results we will use mlflow. Our project repository will follow the MLOps cookie cutter template for organizing code, data, configs and logs so that they can be reproduced easily. Environment dependencies will be specified in a requirements.txt file and training will be done locally or on Colab.
+
+By the end of Phase 1 we aim to produce a working GCN based classification model, and a reproducible pipeline ready for scaling in later phases.
+
+### 8.2 Selection of Data
+#### Dataset chosen and Justification
+We have chosen the Cora dataset as it is a standard benchmark for graph based learning models. It contains 2708 ml research papers which are classified into 7 topic categories with over 5429 citation edges. Each paper has a 1433 dimensional binary feature vector that indicates the presence or absence of common words from bag-of-words. The dataset is also publicly available.
+
+#### Dataset source and access method
+The Cora dataset is part of the pytorch geometric library and can be easily downloaded and loaded using the same library. Currently the access method for the data is local, with plans to move it to some cloud space by next phase.
+
+#### PreProcessing Steps
+The Cora dataset is a completely cleaned and well-organized dataset. The only preprocessing being applied is normalizing data, which normalizes all the features.
+
+### 8.3 Model Considerations
+#### Model architectures considered
+We have considered two architectures: Graph Convolutional Networks and Graph Attention Networks.
+
+#### Rationale for model choice
+Currently we have already trained Graph Convolutional Networks which is giving up to 79% accuracy on the test subset of the Cora data. But the attention mechanism of Graph Attention Networks are shown to learn significantly more important features and correlation using the attention mechanism. Hence, by the next phase we might switch to Graph Attention Networks and compare the results.
+
+#### Source/Citation for any pre built models
+We haven’t used any pre-built models yet. We have built our own architecture for the Graph Convolutional Network.
+
+### 8.4 Open-source Tools
+#### Third-party packages
+**Core ML:-**
+**PyTorch Geometric:** Extension of PyTorch for handling graph-structured data. Used for implementing Graph Neural Networks (GNNs) for citation network analysis.
+
+**Data Processing & Analysis:-**
+**Networkx:** Used for graph manipulation and analysis. Helps in processing citation networks, computing graph metrics, and visualizing network structures.
+scikit-learn: Provides tools for data preprocessing, model evaluation, and traditional machine learning algorithms. Used for feature engineering and baseline models.
+
+**Development & Code Quality:-**
+**isort:** Automatically sorts Python imports alphabetically and by type. Ensures consistent import ordering across the codebase.
+**ruff:** fast Python linter and formatter. Used for maintaining code quality and enforcing style guidelines.
+**mypy:** for static type checking.
+
+**Additional Dependencies:-**
+**matplotlib:** Used for data visualization and plotting results.
+**numpy:** Provides efficient numerical operations and array manipulations.
 
 --------
 <p><small>Project based on the <a target="_blank" href="https://github.com/Chim-SO/cookiecutter-mlops/">cookiecutter MLOps project template</a>

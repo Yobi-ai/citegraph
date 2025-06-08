@@ -1,11 +1,14 @@
 import logging
+from rich import print
+
 import os
+from typing import Dict, Tuple
 
 import hydra
 import torch
 import torch.nn.functional as F
+
 from omegaconf import OmegaConf
-from rich import print
 
 from dataloader import Dataset
 from model import GCN, Model
@@ -26,11 +29,12 @@ logger.propagate = False
 
 
 class Inference:
-    def __init__(self, cfg):
+    def __init__(self, cfg: DictConfig) -> None:
         self._model = Model(cfg.model_path)
         self._data = Dataset().load_cora(cfg.data_path)[0]
         self._k = cfg.k
-        self._label_dict = {
+  
+        self._label_dict: Dict[int, str] = {
             0: "Theory",
             1: "Reinforcement_Learning",
             2: "Genetic_Algorithms",
@@ -49,6 +53,7 @@ class Inference:
         orig_data.x = torch.cat([orig_data.x, word_vector], dim=0)
         new_node_index = orig_data.num_nodes - 1
         #print(new_node_index)
+
         logger.info("Starting Prediction")
         similarities = F.cosine_similarity(word_vector, orig_data.x)
         top_k_indices = similarities.topk(self._k).indices.tolist()
@@ -77,7 +82,7 @@ class Inference:
 @hydra.main(
     version_base=None, config_path="confs/inference", config_name="inference_conf"
 )
-def main(cfg):
+def main(cfg: DictConfig) -> None:
     logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
     inf_obj = Inference(cfg)
 
