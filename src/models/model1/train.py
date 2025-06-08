@@ -16,14 +16,15 @@ import torch.nn.functional as F
 from omegaconf import DictConfig, OmegaConf
 from rich import print
 
-from ...utils.monitor import log_system_metrics
-from .dataloader import Dataset
-from .model import GCN
+from dataloader import Dataset
+from model import GCN
 
 # Add src directory to Python path
 src_path = str(Path(__file__).parent.parent.parent)
 if src_path not in sys.path:
     sys.path.append(src_path)
+
+from utils.monitor import log_system_metrics
 
 
 logger = logging.getLogger(__name__)
