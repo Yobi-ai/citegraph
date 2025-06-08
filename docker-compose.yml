@@ -5,6 +5,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+    networks:
+      - app-network
     volumes:
       - .:/app
       - ./data:/app/data
@@ -13,4 +18,8 @@ services:
     environment:
       - MODEL_PATH=/app/models/model_5000.pth
       - DATA_PATH=/app/data/processed
-    command: python src/models/model1/train.py 
+    command: python src/models/model1/train.py
+
+networks:
+  app-network:
+    driver: bridge

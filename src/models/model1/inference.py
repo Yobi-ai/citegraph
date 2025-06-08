@@ -1,18 +1,15 @@
 import logging
-from rich import print
-
 import os
-from typing import Dict, Tuple
+from typing import Dict
 
 import hydra
 import torch
 import torch.nn.functional as F
-
-from omegaconf import OmegaConf
-
 from dataloader import Dataset
-from model import GCN, Model
+from model import Model
+from omegaconf import DictConfig, OmegaConf
 from process_new_files import convert_pdf_to_word_vector
+from rich import print
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), "logs")
@@ -33,7 +30,7 @@ class Inference:
         self._model = Model(cfg.model_path)
         self._data = Dataset().load_cora(cfg.data_path)[0]
         self._k = cfg.k
-  
+
         self._label_dict: Dict[int, str] = {
             0: "Theory",
             1: "Reinforcement_Learning",
@@ -44,21 +41,25 @@ class Inference:
             6: "Rule_Learning",
         }
 
-    def run_sample(self, pdf_path:str, vocab_path:str) -> tuple[int, str]:
+    def run_sample(self, pdf_path: str, vocab_path: str) -> str:
         logger.info("Starting Processing File")
         orig_data = self._data
-        orig_edge_index = self._data.edge_index
-        word_vector = torch.tensor(convert_pdf_to_word_vector(pdf_path, vocab_path), dtype=torch.float).unsqueeze(dim=0)
-        #print(orig_data.x.shape, word_vector.shape)
+        # orig_edge_index = self._data.edge_index
+        word_vector = torch.tensor(
+            convert_pdf_to_word_vector(pdf_path, vocab_path), dtype=torch.float
+        ).unsqueeze(dim=0)
+        # print(orig_data.x.shape, word_vector.shape)
         orig_data.x = torch.cat([orig_data.x, word_vector], dim=0)
         new_node_index = orig_data.num_nodes - 1
-        #print(new_node_index)
+        # print(new_node_index)
 
         logger.info("Starting Prediction")
         similarities = F.cosine_similarity(word_vector, orig_data.x)
         top_k_indices = similarities.topk(self._k).indices.tolist()
 
-        edges = torch.tensor([[new_node_index] * len(top_k_indices), top_k_indices], dtype=torch.long)
+        edges = torch.tensor(
+            [[new_node_index] * len(top_k_indices), top_k_indices], dtype=torch.long
+        )
         edges = torch.cat([edges, edges.flip(0)], dim=1)
 
         orig_data.edge_index = torch.cat([orig_data.edge_index, edges], dim=1)
@@ -76,7 +77,7 @@ class Inference:
 
         print(f"Predicted node connections/similar indexes: {edges}")
 
-        return pred_idx, pred_label
+        return pred_label
 
 
 @hydra.main(
@@ -91,10 +92,15 @@ def main(cfg: DictConfig) -> None:
     pdf_root_path = "pdfs/"
     if "pdfs" not in os.listdir():
         os.mkdir("pdfs")
-    
+
     pdf_filename = r"Citation Network.pdf"
 
-    print(inf_obj.run_sample(pdf_root_path + pdf_filename, vocab_root_folder + "final_words_dictionary.txt"))
+    print(
+        inf_obj.run_sample(
+            pdf_root_path + pdf_filename,
+            vocab_root_folder + "final_words_dictionary.txt",
+        )
+    )
 
 
 if __name__ == "__main__":
