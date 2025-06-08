@@ -44,6 +44,14 @@ repos:
           - types-requests
           - types-setuptools
           - types-urllib3
-        args: [--ignore-missing-imports]
+        args: [
+            --ignore-missing-imports,
+            --disallow-untyped-defs,
+            --disallow-incomplete-defs,
+            --follow-imports=silent,
+            --allow-untyped-defs,
+            --allow-subclassing-any,
+            --allow-untyped-calls
+          ]
         types: [python]
         files: ^src/
