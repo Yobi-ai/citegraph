@@ -34,6 +34,7 @@ class Inference:
             self._model = GCN(1433, 717, 7)
             self._model.load_state_dict(torch.load(cfg.model_state_path))
         self._data = Dataset().load_cora(cfg.data_path)[0]
+        self._vocab_path = cfg.word_dict_path
         self._k = cfg.k
 
         self._label_dict: Dict[int, str] = {
@@ -46,12 +47,12 @@ class Inference:
             6: "Rule_Learning",
         }
 
-    def run_sample(self, pdf_path: str, vocab_path: str) -> str:
+    def run_sample(self, pdf_path: str) -> str:
         logger.info("Starting Processing File")
         orig_data = self._data
         # orig_edge_index = self._data.edge_index
         word_vector = torch.tensor(
-            convert_pdf_to_word_vector(pdf_path, vocab_path), dtype=torch.float
+            convert_pdf_to_word_vector(pdf_path, self._vocab_path), dtype=torch.float
         ).unsqueeze(dim=0)
         # print(orig_data.x.shape, word_vector.shape)
         orig_data.x = torch.cat([orig_data.x, word_vector], dim=0)
@@ -92,7 +93,7 @@ def main(cfg: DictConfig) -> None:
     logger.info(f"Configuration:\n{OmegaConf.to_yaml(cfg)}")
     inf_obj = Inference(cfg)
 
-    vocab_root_folder = r"D:/Sujays documents & files/MS/IDP/Uni Acceptance Letters/DePaul/Classes/Quarter 6/SE489_MLOps/Project/citegraph/src/data/Cora/CoRA_Raw/"
+    # vocab_root_folder = r"D:/Sujays documents & files/MS/IDP/Uni Acceptance Letters/DePaul/Classes/Quarter 6/SE489_MLOps/Project/citegraph/src/data/Cora/CoRA_Raw/"
 
     pdf_root_path = "pdfs/"
     if "pdfs" not in os.listdir():
@@ -100,12 +101,7 @@ def main(cfg: DictConfig) -> None:
 
     pdf_filename = r"Citation Network.pdf"
 
-    print(
-        inf_obj.run_sample(
-            pdf_root_path + pdf_filename,
-            vocab_root_folder + "final_words_dictionary.txt",
-        )
-    )
+    print(inf_obj.run_sample(pdf_root_path + pdf_filename))
 
 
 if __name__ == "__main__":

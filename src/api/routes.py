@@ -1,7 +1,7 @@
 import os
 from typing import Dict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, File, UploadFile
 from omegaconf import OmegaConf
 
 from ..models.model1.inference import Inference
@@ -29,21 +29,33 @@ async def root() -> Dict[str, str]:
     return {"message": "Welcome to citegraph api"}
 
 
-@router.get("/api/predict")
-async def predict() -> str:
+@router.post("/api/predict")
+async def predict(file: UploadFile = File(...)) -> Dict[str, str]:
     """
-    Inferences on a file.
+    Inferences on an uploaded PDF file.
+
+    Args:
+        file: The PDF file to analyze
 
     Returns:
-        Label of the predicted class for the file.
+        Dictionary containing the predicted label
     """
-    vocab_root_folder = r"app/src/data/Cora/CoRA_Raw/"
-    pdf_root_path = "app/docs/"
-    pdf_filename = r"Citation Network.pdf"
+    # Save uploaded file temporarily
+    temp_file_path = f"/tmp/{file.filename}"
+    with open(temp_file_path, "wb") as buffer:
+        content = await file.read()
+        buffer.write(content)
 
-    inference = Inference(cfg)
-    predicted_label: str = inference.run_sample(
-        pdf_root_path + pdf_filename, vocab_root_folder + "final_words_dictionary.txt"
-    )
+    try:
+        inference = Inference(cfg)
+        predicted_label = inference.run_sample(temp_file_path)
 
-    return predicted_label
+        # Clean up temporary file
+        os.remove(temp_file_path)
+
+        return {"predicted_label": predicted_label}
+    except Exception as e:
+        # Clean up temporary file in case of error
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+        raise e
