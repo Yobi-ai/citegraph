@@ -11,7 +11,9 @@ ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
     MODEL_PATH=/app/models/model_5000.pth \
     DATA_PATH=/app/data/processed \
-    VOCAB_ROOT_FOLDER=/app/data/Cora/CoRA_Raw
+    VOCAB_ROOT_FOLDER=/app/data/Cora/CoRA_Raw \
+    FORCE_CUDA=0 \
+    TORCH_CUDA_ARCH_LIST="None"
 
 # Set working directory
 WORKDIR /app
