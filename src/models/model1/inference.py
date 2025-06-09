@@ -5,11 +5,12 @@ from typing import Dict
 import hydra
 import torch
 import torch.nn.functional as F
-from dataloader import Dataset
-from model import Model
 from omegaconf import DictConfig, OmegaConf
-from process_new_files import convert_pdf_to_word_vector
 from rich import print
+
+from .dataloader import Dataset
+from .model import Model
+from .process_new_files import convert_pdf_to_word_vector
 
 logger = logging.getLogger(__name__)
 log_dir = os.path.join(os.path.normpath(os.getcwd()), "logs")
