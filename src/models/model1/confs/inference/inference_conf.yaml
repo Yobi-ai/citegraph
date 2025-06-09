@@ -1,2 +1,5 @@
-model_path: "../../../models/model_5000.pth"
-data_path: "../../data/"
+model_path: "/app/models/model_5000.pth"
+model_state_path: "/app/models/model_5000_state_dict.pth"
+data_path: "/app/data/processed"
+word_dict_path: "/app/src/data/Cora/CoRA_Raw/final_words_dictionary.txt"
+k: 5
