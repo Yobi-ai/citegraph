@@ -46,8 +46,7 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        IMAGE_URI=us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph
+        IMAGE_URI=us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph/graph_image
 
         docker build -t $IMAGE_URI:latest -t $IMAGE_URI:${{ env.VERSION }} .
         docker push $IMAGE_URI:latest
-        docker push $IMAGE_URI:${{ env.VERSION }}
