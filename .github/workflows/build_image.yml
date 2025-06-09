@@ -1,12 +1,21 @@
-name: Build & Push Docker to GCP
+name: Build & Push Docker Image with Versioning to GCP
 
 on:
-  pull_request:
-    branches: [main]  # Or your deployment branch
+  push:
+    tags:
+      - 'v*'  # Triggers only on version tags like v1.0.0
+    branches:
+      - main  # Also runs on main (optional)
 
 jobs:
   docker-build-push:
     runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: your-project-id
+      REGION: us  # or your region
+      REPOSITORY: my-repo
+      IMAGE_NAME: my-app
 
     steps:
     - name: Checkout Code
@@ -22,13 +31,23 @@ jobs:
 
     - name: Configure Docker for Artifact Registry
       run: |
-        gcloud auth configure-docker us-east1-docker.pkg.dev --quiet
+        gcloud auth configure-docker us-east1-docker.pkg.dev
+
+    - name: Set version tags
+      id: vars
+      run: |
+        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          VERSION="${GITHUB_REF#refs/tags/}"
+        else
+          VERSION="dev-${GITHUB_SHA::7}"
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Build and Push Docker Image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+      run: |
+        IMAGE_URI=us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph:latest
+
+        docker build -t $IMAGE_URI:latest -t $IMAGE_URI:${{ env.VERSION }} .
+        docker push $IMAGE_URI:latest
+        docker push $IMAGE_URI:${{ env.VERSION }}
