@@ -1,7 +1,7 @@
 import gradio as gr
 import requests
 
-BASE_URL = "http://0.0.0.0:8080"
+BASE_URL = "http://127.0.0.1:8001"
 HEADERS = {"Content-Type": "application/json"}
 
 
@@ -13,7 +13,10 @@ def load_documents(file_path):
             file = {"file": f}
             response = requests.post(url, files=file)
         f.close()
-    return response.json()
+
+    output = response.json()
+    print(output)
+    return output["predicted_label"]
 
 
 def createUI():
