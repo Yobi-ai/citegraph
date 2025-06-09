@@ -9,7 +9,7 @@ from omegaconf import DictConfig, OmegaConf
 from rich import print
 
 from .dataloader import Dataset
-from .model import Model
+from .model import GCN, Model
 from .process_new_files import convert_pdf_to_word_vector
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,11 @@ logger.propagate = False
 
 class Inference:
     def __init__(self, cfg: DictConfig) -> None:
-        self._model = Model(cfg.model_path)
+        try:
+            self._model = Model(cfg.model_path)
+        except Exception:
+            self._model = GCN(1433, 717, 7)
+            self._model.load_state_dict(torch.load(cfg.model_state_path))
         self._data = Dataset().load_cora(cfg.data_path)[0]
         self._k = cfg.k
 

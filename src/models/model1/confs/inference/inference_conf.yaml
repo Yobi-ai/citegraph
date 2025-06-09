@@ -1,3 +1,4 @@
 model_path: "/app/models/model_5000.pth"
+model_state_path: "/app/models/model_5000_state_dict.pth"
 data_path: "/app/data/processed"
 k: 5

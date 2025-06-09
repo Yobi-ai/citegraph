@@ -58,6 +58,17 @@ class Model:
         if self._model is not None:
             self._model.eval()
 
+    def state_dict(self):
+        return self._model.state_dict()
+
+    def save(self, save_path: str) -> None:
+        if self._model is not None:
+            torch.save(self._model, save_path)
+
+    def save_state_dict(self, save_path: str) -> None:
+        if self._model is not None:
+            torch.save(self._model.state_dict(), save_path)
+
     def __call__(self, input: torch.Tensor, edge_index: torch.Tensor) -> torch.Tensor:
         if self._model is None:
             raise RuntimeError("Model not loaded")
