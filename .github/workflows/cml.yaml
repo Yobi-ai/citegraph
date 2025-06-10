@@ -35,7 +35,7 @@ jobs:
           pip install -r requirements.txt
 
           # Run training with test configuration
-          python src/models/model1/train.py --config-name=training_conf experiment=test_train
+          python src/models/model1/train.py epochs=500
 
           # Create results file
           echo "## Training Report" > results.txt

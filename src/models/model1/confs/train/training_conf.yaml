@@ -1,8 +1,9 @@
+# Base configuration
 defaults:
-  - experiment: full_train
   - _self_
+  - experiment: full_train
 
-# These are the default values that will be overridden by experiment configs
+# Default values
 data_path: "../../data/"
 hidden_dim: 400
 lr: 0.001
