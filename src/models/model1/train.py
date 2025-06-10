@@ -18,7 +18,7 @@ from model import GCN
 from omegaconf import DictConfig, OmegaConf
 from rich import print
 
-from utils.monitor import log_system_metrics
+from src.utils.monitor import log_system_metrics
 
 # Add src directory to Python path
 src_path = str(Path(__file__).parent.parent.parent)

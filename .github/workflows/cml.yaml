@@ -28,6 +28,8 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
+          cd ${{ github.workspace }}
+
           # Run training
           python src/models/model1/train.py experiment=test_train
 
