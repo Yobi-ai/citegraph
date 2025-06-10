@@ -9,7 +9,6 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    container: docker://iterativeai/cml:0-dvc2-base1
     steps:
       - uses: actions/checkout@v3
 
@@ -24,6 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install "dvc[gdrive]"
+          pip install git+https://github.com/iterative/cml.git
 
       - name: Train model
         env:
