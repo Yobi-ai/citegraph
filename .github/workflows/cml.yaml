@@ -17,13 +17,6 @@ jobs:
     # container: ghcr.io/iterative/cml:0-dvc2-base1
     steps:
       - uses: actions/checkout@v3
-      # may need to setup NodeJS & Python3 on e.g. self-hosted
-      # - uses: actions/setup-node@v3
-      #   with:
-      #     node-version: '16'
-      # - uses: actions/setup-python@v4
-      #   with:
-      #     python-version: '3.x'
       - uses: iterative/setup-cml@v1
 
       - name: Train model
@@ -45,6 +38,24 @@ jobs:
           echo "## Training Report" > results.txt
           echo "### Model Performance" >> results.txt
           echo "Training completed successfully!" >> results.txt
+
+          # Get latest MLflow metrics
+          echo "### Latest MLflow Metrics" >> results.txt
+          echo "\`\`\`" >> results.txt
+          mlflow ui --port 5000 &
+          sleep 5
+          curl http://localhost:5000/api/2.0/mlflow/runs/search | jq '.' >> results.txt
+          echo "\`\`\`" >> results.txt
+
+          # Get training results from the last run
+          echo "### Training Results" >> results.txt
+          echo "\`\`\`" >> results.txt
+          if [ -f "mlruns/latest_run/metrics.json" ]; then
+            cat mlruns/latest_run/metrics.json >> results.txt
+          else
+            echo "No metrics file found" >> results.txt
+          fi
+          echo "\`\`\`" >> results.txt
 
       - name: Write CML report
         env:
