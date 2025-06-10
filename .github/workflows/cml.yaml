@@ -21,17 +21,34 @@ jobs:
       #   with:
       #     python-version: '3.x'
       - uses: iterative/setup-cml@v1
+
       - name: Train model
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYTHONPATH: ${{ github.workspace }}
+          HYDRA_FULL_ERROR: 1
         run: |
           # Your ML workflow goes here
           cd ${{ github.workspace }}
 
-          # Run training
+          # Install dependencies
           pip install -r requirements.txt
-          python src/models/model1/train.py +experiment=test_train
+
+          # Run training with test configuration
+          python src/models/model1/train.py experiment=test_train
+
+          # Create results file
+          echo "## Training Report" > results.txt
+          echo "### Model Performance" >> results.txt
+          echo "Training completed successfully!" >> results.txt
+
+          # Get latest metrics from MLflow
+          echo "### Latest Metrics" >> results.txt
+          echo "\`\`\`" >> results.txt
+          mlflow ui --port 5000 &
+          sleep 5
+          curl http://localhost:5000/api/2.0/mlflow/runs/search | jq '.' >> results.txt
+          echo "\`\`\`" >> results.txt
 
       - name: Write CML report
         env:

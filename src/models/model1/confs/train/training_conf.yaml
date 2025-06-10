@@ -1,6 +1,6 @@
 defaults:
-  - experiment: full_train
   - _self_
+  - experiment: full_train
 
 data_path: "../../data/"
 hidden_dim: 400
