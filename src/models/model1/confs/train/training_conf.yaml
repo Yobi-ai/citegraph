@@ -1,6 +1,5 @@
 defaults:
   - experiment: full_train
-  - override experiment: test_train
   - _self_
 
 data_path: "../../data/"

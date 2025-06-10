@@ -9,53 +9,31 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    # optionally use a convenient Ubuntu LTS + DVC + CML image
+    # container: ghcr.io/iterative/cml:0-dvc2-base1
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install "dvc[gdrive]"
-
+      # may need to setup NodeJS & Python3 on e.g. self-hosted
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version: '16'
+      # - uses: actions/setup-python@v4
+      #   with:
+      #     python-version: '3.x'
+      - uses: iterative/setup-cml@v1
       - name: Train model
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PYTHONPATH: ${{ github.workspace }}
         run: |
+          # Your ML workflow goes here
           cd ${{ github.workspace }}
 
           # Run training
-          python src/models/model1/train.py experiment=test_train
+          pip install -r requirements.txt
+          python src/models/model1/train.py +experiment=test_train
 
-          # Create CML report
-          echo "## Training Report" > report.md
-          echo "### Model Performance" >> report.md
-          echo "Training completed successfully!" >> report.md
-
-          # Get latest metrics from MLflow
-          echo "### Latest Metrics" >> report.md
-          echo "\`\`\`" >> report.md
-          mlflow ui --port 5000 &
-          sleep 5
-          curl http://localhost:5000/api/2.0/mlflow/runs/search | jq '.' >> report.md
-          echo "\`\`\`" >> report.md
-
-      - name: Comment PR
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const report = fs.readFileSync('report.md', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: report
-            });
+      - name: Write CML report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Post reports as comments in GitHub PRs
+          cat results.txt >> report.md
+          cml comment create report.md
