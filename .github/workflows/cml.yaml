@@ -42,14 +42,6 @@ jobs:
           echo "### Model Performance" >> results.txt
           echo "Training completed successfully!" >> results.txt
 
-          # Get latest metrics from MLflow
-          echo "### Latest Metrics" >> results.txt
-          echo "\`\`\`" >> results.txt
-          mlflow ui --port 5000 &
-          sleep 5
-          curl http://localhost:5000/api/2.0/mlflow/runs/search | jq '.' >> results.txt
-          echo "\`\`\`" >> results.txt
-
       - name: Write CML report
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
