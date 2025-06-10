@@ -31,13 +31,12 @@ jobs:
           # Install dependencies
           pip install -r requirements.txt
 
-          # Run training with test configuration
-          python src/models/model1/train.py epochs=500
-
-          # Create results file
+          # Run training with test configuration and capture output
           echo "## Training Report" > results.txt
-          echo "### Model Performance" >> results.txt
-          echo "Training completed successfully!" >> results.txt
+          echo "### Training Metrics" >> results.txt
+          echo "\`\`\`" >> results.txt
+          python src/models/model1/train.py epochs=500 2>&1 | tee -a results.txt
+          echo "\`\`\`" >> results.txt
 
           # Get latest MLflow metrics
           echo "### Latest MLflow Metrics" >> results.txt
