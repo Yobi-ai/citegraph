@@ -16,11 +16,17 @@ def load_documents(file_path):
 
     output = response.json()
     print(output)
-    return f"Output: {output['predicted_label']}"
+    return f"# Output: \n{output['predicted_label']}"
 
 
 def createUI():
-    with gr.Blocks() as demo:
+    css = """
+        h1 {
+            text-align: center;
+            display:block;
+        }
+    """
+    with gr.Blocks(css=css) as demo:
         with gr.Row():
             with gr.Column(scale=1):
                 # pdf_display = gr.Image(
@@ -29,7 +35,7 @@ def createUI():
                 upload_btn = gr.File(label="Upload a PDF", file_types=[".pdf"])
 
         with gr.Row():
-            class_label = gr.Markdown("Output: ")
+            class_label = gr.Markdown("# Output: ")
 
         upload_btn.upload(
             fn=load_documents,
