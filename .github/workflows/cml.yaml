@@ -42,18 +42,23 @@ jobs:
           # Get latest MLflow metrics
           echo "### Latest MLflow Metrics" >> results.txt
           echo "\`\`\`" >> results.txt
-          mlflow ui --port 5000 &
-          sleep 5
-          curl http://localhost:5000/api/2.0/mlflow/runs/search | jq '.' >> results.txt
-          echo "\`\`\`" >> results.txt
-
-          # Get training results from the last run
-          echo "### Training Results" >> results.txt
-          echo "\`\`\`" >> results.txt
-          if [ -f "mlruns/latest_run/metrics.json" ]; then
-            cat mlruns/latest_run/metrics.json >> results.txt
+          if [ -d "mlruns" ]; then
+            # Find the latest run directory
+            LATEST_RUN=$(ls -t mlruns/*/ | head -n1)
+            if [ -n "$LATEST_RUN" ]; then
+              echo "Latest run metrics:" >> results.txt
+              if [ -f "${LATEST_RUN}metrics" ]; then
+                cat "${LATEST_RUN}metrics" >> results.txt
+              fi
+              if [ -f "${LATEST_RUN}params" ]; then
+                echo -e "\nRun parameters:" >> results.txt
+                cat "${LATEST_RUN}params" >> results.txt
+              fi
+            else
+              echo "No MLflow runs found" >> results.txt
+            fi
           else
-            echo "No metrics file found" >> results.txt
+            echo "MLflow directory not found" >> results.txt
           fi
           echo "\`\`\`" >> results.txt
 
