@@ -319,6 +319,14 @@ The project uses GitHub Actions for continuous integration. The workflow is defi
    - Uses pytest-cov for coverage reporting
    - Shows coverage report in the terminal
 
+### CI/CML Pipeline:
+Triggered  whenever a commit is pushed to the main branch
+1. **Training**
+   - Runs the training script and stores the final training metrics in the commit/pr report and the models as well.
+
+2. **Evaluation**
+   -  Runs Evaluation and stores all metrics and plots in the commit/pr report.
+
 ### Docker Image Build and Deployment
 
 The project includes an automated Docker image build and deployment workflow (`.github/workflows/build_image.yml`) that:
