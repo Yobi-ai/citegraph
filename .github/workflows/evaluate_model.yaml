@@ -1,5 +1,7 @@
 name: evaluate_model_cml
-on: [push]
+on:
+  pull_request:
+    branches: [ dev ]
 jobs:
   run:
     runs-on: [ubuntu-latest]
