@@ -35,12 +35,15 @@ jobs:
           echo "## Training Report" > results.txt
           echo "### Training Metrics (at 50-epoch intervals)" >> results.txt
           echo "\`\`\`" >> results.txt
-          python src/models/model1/train.py epochs=500 2>&1 | grep -E "Epoch: [0-9]+00," >> results.txt
+          python src/models/model1/train.py epochs=500 2>&1 | tee -a results.txt
           echo "\`\`\`" >> results.txt
 
       - name: Evaluate model
+        env:
+          PYTHONPATH: ${{ github.workspace }}/src
         run: |
-            python src/models/model1/test.py
+          cd ${{ github.workspace }}
+          python -m src.models.model1.test
       - name: Write report
         env:
           # this authenticates that the right permissions are in place
