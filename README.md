@@ -369,6 +369,17 @@ git push origin main
 3. Pytest Testing:
 ![Pytest](images/pytest.jpg)
 
+4. CI/CML:
+![image](https://github.com/user-attachments/assets/3ed4c64e-379f-4b52-ac8f-4ff601767c81)
+PR: https://github.com/Yobi-ai/citegraph/pull/38
+
+5: Huggingface Deployment:
+![image](https://github.com/user-attachments/assets/1c25b5d2-7e13-4684-8fca-83015cc57dfd)
+![image](https://github.com/user-attachments/assets/033a616f-6775-48e6-80b9-2e41e6f5c8e3)
+Link: https://huggingface.co/spaces/psujay/citegraph
+
+
+
 ### Code Debugging
 - The code was debugged using the built in debugger, breakpoint and step-over functionality of VS code.
 - Some Debugging Scenarios include:
@@ -387,6 +398,9 @@ git push origin main
         - Integrated psutil to log system usage metrics
         - Integrated Cprofiler to create profile of funtions running and ouput to .prof file
         - updated readme with necessary documentation.
+        - Contributed to CML
+        - GCP Artifact Registry and Backend.
+        - Fast API
 
         Sujay:
         - Setup the Environment and requirements
@@ -398,6 +412,11 @@ git push origin main
         - Implemented Experiment Tracking using mlflow.
         - Implemented configuration management using Hydra.
         - Implemented logging using python logging and rich.
+        - Created Innference, Testing Pipelines
+        - Contributed to CML
+        - Gradio UI
+        - Hugging Face Deployment
+        
 
 ## 7. References
 - [ ] List of datasets, frameworks, and major third-party tools used
