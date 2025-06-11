@@ -2,7 +2,7 @@ services:
   citegraph:
     image: us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph/graph_image:latest
     ports:
-      - "8001:8001"
+      - "8080:8080"
     restart: unless-stopped
     volumes:
       - .:/app
