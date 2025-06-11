@@ -55,7 +55,8 @@ jobs:
     - name: Deploy to Cloud Run
       uses: google-github-actions/deploy-cloudrun@v2
       with:
-        service: my-service
+        service: graph-image
         image: us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph/graph_image:latest
         region: us-east1
         project_id: infra-actor-462322-s1
+        env_vars: PORT=8000
