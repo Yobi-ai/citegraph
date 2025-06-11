@@ -31,6 +31,9 @@ jobs:
     - name: Run isort
       run: isort . --check-only --profile black
 
+    - name: Run mypy
+      run: mypy . --ignore-missing-imports --disallow-untyped-defs --disallow-incomplete-defs --follow-imports=silent --allow-untyped-defs --allow-subclassing-any --allow-untyped-calls
+
     - name: Run tests
       env:
         PYTHONPATH: ${{ github.workspace }}
@@ -42,3 +45,4 @@ jobs:
       with:
         file: ./coverage.xml
         fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
