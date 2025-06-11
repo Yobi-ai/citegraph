@@ -51,7 +51,7 @@ jobs:
           echo "## Model Evaluation" >> report.md
           echo "### Test Results" >> report.md
           echo "\`\`\`" >> report.md
-          python -m src.models.model1.test 2>&1 | tee -a report.md
+          python -m src.models.model1.test.py 2>&1 | tee -a report.md
           echo "\`\`\`" >> report.md
 
           # Add any evaluation metrics or visualizations
