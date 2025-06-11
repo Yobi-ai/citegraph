@@ -43,7 +43,7 @@ jobs:
 
       - name: Evaluate model
         env:
-          PYTHONPATH: ${{ github.workspace }}/src
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           cd ${{ github.workspace }}
 
