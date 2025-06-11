@@ -317,16 +317,47 @@ The project uses GitHub Actions for continuous integration. The workflow is defi
 
 2. **Coverage Reporting**:
    - Uses pytest-cov for coverage reporting
-   - Uploads coverage reports to Codecov
-   - Requires a Codecov token (CODECOV_TOKEN) in repository secrets
+   - Shows coverage report in the terminal
 
-To set up Codecov:
-1. Create an account at [Codecov.io](https://codecov.io)
-2. Add your repository
-3. Get your repository upload token
-4. Add the token as a secret in your GitHub repository:
-   - Name: `CODECOV_TOKEN`
-   - Value: Your Codecov token
+### Docker Image Build and Deployment
+
+The project includes an automated Docker image build and deployment workflow (`.github/workflows/build_image.yml`) that:
+
+1. **Triggers**:
+   - On version tags (e.g., v1.0.0)
+   - On pushes to main branch
+
+2. **Build Process**:
+   - Uses Docker Buildx for efficient builds
+   - Authenticates with Google Cloud Platform
+   - Configures Docker for Google Artifact Registry
+   - Sets version tags based on git tags or commit SHA
+
+3. **Image Versioning**:
+   - Latest tag for the most recent build
+   - Version-specific tags (e.g., v1.0.0)
+   - Development tags for non-release builds
+
+4. **Deployment**:
+   - Automatically deploys to Google Cloud Run
+   - Configures service with:
+     - 2GB memory
+     - 2 CPU cores
+     - Public access enabled
+
+5. **Required Secrets**:
+   - `GCP_SA_KEY`: Google Cloud service account key
+   - Project ID and region configured in workflow
+
+To trigger a new build and deployment:
+```bash
+# For a new version
+git tag v1.0.0
+git push origin v1.0.0
+
+# For development builds
+git push origin main
+```
 
 ### Code Debugging
 - The code was debugged using the built in debugger, breakpoint and step-over functionality of VS code.
