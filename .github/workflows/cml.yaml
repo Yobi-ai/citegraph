@@ -67,9 +67,9 @@ jobs:
           # # Add any evaluation metrics or visualizations
           if [ -f "evaluation_report.txt" ]; then
             echo "### Detailed Evaluation Metrics" >> report.md
-            # echo "\`\`\`" >> report.md
+            echo "\`\`\`" >> report.md
             cat evaluation_report.txt >> report.md
-            # echo "\`\`\`" >> report.md
+            echo "\`\`\`" >> report.md
           fi
 
       - name: Generate visualizations

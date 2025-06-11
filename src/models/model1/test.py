@@ -16,6 +16,15 @@ def test(model, data):
     print("Running Test on Test Set")
     model.eval()
     with torch.no_grad():
+        labels_list = [
+            "Theory",
+            "Reinforcement_Learning",
+            "Genetic_Algorithms",
+            "Neural_Networks",
+            "Probabilistic_Methods",
+            "Case_Based",
+            "Rule_Learning",
+        ]
         out = model(data.x, data.edge_index)
         test_loss = F.nll_loss(out[data.test_mask], data.y[data.test_mask]).item()
         pred = out.argmax(dim=1)
@@ -31,9 +40,11 @@ def test(model, data):
             )
         confmat = confusion_matrix(data.y[data.test_mask], pred[data.test_mask])
         print(confmat)
-        disp = ConfusionMatrixDisplay(confusion_matrix=confmat)
+        disp = ConfusionMatrixDisplay(
+            confusion_matrix=confmat, display_labels=labels_list
+        )
+        disp.plot(cmap=plt.cm.Blues, values_format="d")
         plt.savefig("confusion_matrix.png")
-        disp.plot()
     return test_loss, test_acc
 
 
