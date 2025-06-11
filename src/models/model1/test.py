@@ -30,6 +30,7 @@ def test(model, data):
                 ]
             )
         confmat = confusion_matrix(data.y[data.test_mask], pred[data.test_mask])
+        print(confmat)
         disp = ConfusionMatrixDisplay(confusion_matrix=confmat)
         plt.savefig("confusion_matrix.png")
         disp.plot()
@@ -49,3 +50,8 @@ def main(cfg: DictConfig) -> None:
 
     data = Dataset().load_cora(cfg.data_path)[0]
     test(model, data)
+
+
+if __name__ == "__main__":
+    print("Starting Test")
+    main()
