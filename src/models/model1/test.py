@@ -13,6 +13,7 @@ from sklearn.metrics import (
 
 
 def test(model, data):
+    print("Running Test on Test Set")
     model.eval()
     with torch.no_grad():
         out = model(data.x, data.edge_index)
