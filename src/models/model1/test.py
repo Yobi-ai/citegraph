@@ -37,7 +37,7 @@ def test(model, data):
     return test_loss, test_acc
 
 
-@hydra.main(version_base=None, config_path="confs/test", config_name="inference_conf")
+@hydra.main(version_base=None, config_path="confs/test", config_name="test_conf")
 def main(cfg: DictConfig) -> None:
     model = None
     try:
