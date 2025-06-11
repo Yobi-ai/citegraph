@@ -38,8 +38,7 @@ jobs:
           echo "## Training Results" >> report.md
           python src/models/model1/train.py epochs=50
           echo "\`\`\`" >> report.md
-          echo "Epoch,Train Loss,Train Acc,Val Loss,Val Acc" | column -t -s, >> report.md
-          tail -n 1 training_results.csv | column -t -s, -N Epoch,Train Loss,Train Acc,Val Loss,Val Acc >> report.md
+          cat <(head -1 training_results.csv) <(tail -1 training_results.csv) | column -s, -t >> report.md
           echo "\`\`\`" >> report.md
 
       - name: Evaluate model
