@@ -9,8 +9,10 @@ from pathlib import Path
 from typing import List, Tuple
 
 import hydra
+import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
 from omegaconf import DictConfig, OmegaConf
@@ -18,6 +20,7 @@ from rich import print
 
 from src.models.model1.dataloader import Dataset
 from src.models.model1.model import GCN
+
 from src.utils.monitor import log_system_metrics
 
 # Add src directory to Python path
@@ -59,6 +62,9 @@ class Trainer:
         self._val_acc_over_time: List[float] = []
         self._file = open("training_results.csv", "w")
         self._csv_writer = csv.writer(self._file)
+        self._csv_writer.writerow(
+            ["Epoch", "Train_Loss", "Train_Acc", "Val_Loss", "Val_Acc"]
+        )
 
         self.__intialize_objects(cfg.data_path, cfg.hidden_dim, cfg.lr)
 
@@ -196,9 +202,33 @@ class Trainer:
                 stats.strip_dirs().sort_stats("cumulative").print_stats(20)
 
         self.__cleanup()
+        self.__plot()
 
     def __cleanup(self) -> None:
         self._file.close()
+
+    def __plot(self) -> None:
+        df = pd.read_csv("training_results.csv", header=0)
+        print(df)
+        plt.figure(figsize=(10, 6))
+        plt.plot(df["Epoch"], df["Train_Loss"], label="Training Loss")
+        plt.plot(df["Epoch"], df["Val_Loss"], label="Validation Loss")
+        plt.title("Training and Validation Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        plt.legend()
+        plt.savefig("loss_plot.png")
+        plt.close()
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(df["Epoch"], df["Train_Acc"], label="Training Accuracy")
+        plt.plot(df["Epoch"], df["Val_Acc"], label="Validation Accuracy")
+        plt.title("Training and Validation Accuracy")
+        plt.xlabel("Epoch")
+        plt.ylabel("Accuracy")
+        plt.legend()
+        plt.savefig("acc_plot.png")
+        plt.close()
 
 
 @hydra.main(version_base=None, config_path="confs/train", config_name="training_conf")

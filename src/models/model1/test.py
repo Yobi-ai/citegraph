@@ -2,6 +2,8 @@ import hydra
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
+from dataloader import Dataset
+from model import GCN, Model
 from omegaconf import DictConfig
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
@@ -9,13 +11,20 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-from .dataloader import Dataset
-from .model import GCN, Model
-
 
 def test(model, data):
+    print("Running Test on Test Set")
     model.eval()
     with torch.no_grad():
+        labels_list = [
+            "Theory",
+            "Reinforcement_Learning",
+            "Genetic_Algorithms",
+            "Neural_Networks",
+            "Probabilistic_Methods",
+            "Case_Based",
+            "Rule_Learning",
+        ]
         out = model(data.x, data.edge_index)
         test_loss = F.nll_loss(out[data.test_mask], data.y[data.test_mask]).item()
         pred = out.argmax(dim=1)
@@ -30,22 +39,30 @@ def test(model, data):
                 ]
             )
         confmat = confusion_matrix(data.y[data.test_mask], pred[data.test_mask])
-        disp = ConfusionMatrixDisplay(confusion_matrix=confmat)
+        print(confmat)
+        plt.figure(figsize=(15, 15))
+        plt.xticks(rotation=90)
+        disp = ConfusionMatrixDisplay(
+            confusion_matrix=confmat, display_labels=labels_list
+        )
+        disp.plot(cmap=plt.cm.Blues, values_format="d")
         plt.savefig("confusion_matrix.png")
-        disp.plot()
     return test_loss, test_acc
 
 
-@hydra.main(version_base=None, config_path="confs/test", config_name="inference_conf")
+@hydra.main(version_base=None, config_path="confs/test", config_name="test_conf")
 def main(cfg: DictConfig) -> None:
     model = None
     try:
         model = Model(f"{cfg.model_path}/model.pth")
     except Exception:
         model = GCN(1433, 717, 7)
-        model.load_state_dict(
-            torch.load(f"{cfg.model_state_path}/model_state_dict.pth")
-        )
+        model.load_state_dict(torch.load(f"{cfg.model_path}/model_state_dict.pth"))
 
     data = Dataset().load_cora(cfg.data_path)[0]
     test(model, data)
+
+
+if __name__ == "__main__":
+    print("Starting Test")
+    main()
