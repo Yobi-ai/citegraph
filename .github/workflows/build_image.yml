@@ -59,3 +59,7 @@ jobs:
         image: us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph/graph_image:latest
         region: us-east1
         project_id: infra-actor-462322-s1
+        flags: >
+          --memory=2000Mi
+          --cpu=2
+          --allow-unauthenticated
