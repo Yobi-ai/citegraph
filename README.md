@@ -359,6 +359,16 @@ git push origin v1.0.0
 git push origin main
 ```
 
+### Screenshots:
+1. GCP Model Backend:
+![GCP Backend](images/gcp_backend.jpg)
+
+2. GCP Artifact Registry:
+![GCP Registry](images/gcp_registry.jpg)
+
+3. Pytest Testing:
+![Pytest](images/pytest.jpg)
+
 ### Code Debugging
 - The code was debugged using the built in debugger, breakpoint and step-over functionality of VS code.
 - Some Debugging Scenarios include:
