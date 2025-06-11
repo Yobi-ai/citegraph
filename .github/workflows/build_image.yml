@@ -50,3 +50,11 @@ jobs:
 
         docker build -t $IMAGE_URI:latest -t $IMAGE_URI:${{ env.VERSION }} .
         docker push $IMAGE_URI:latest
+
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v0
+      with:
+        service: my-service
+        image: us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph/graph_image:latest
+        region: us-east1
+        credentials: ${{ secrets.GCP_SA_KEY }}
