@@ -13,12 +13,13 @@ import mlflow
 import numpy as np
 import torch
 import torch.nn.functional as F
-from dataloader import Dataset
-from model import GCN
 from omegaconf import DictConfig, OmegaConf
 from rich import print
 
 from utils.monitor import log_system_metrics
+
+from .dataloader import Dataset
+from .model import GCN
 
 # Add src directory to Python path
 src_path = str(Path(__file__).parent.parent.parent)
