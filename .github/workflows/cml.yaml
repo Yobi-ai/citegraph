@@ -58,7 +58,7 @@ jobs:
           python src/models/model1/test.py # 2>&1 | tee -a ../../../../report.md
           python -c "print('Testing again')"
           python -c "import os; print(os.listdir())"
-          python -c "import os; print(os.listdir(src/models/model1))"
+          python -c "import os; print(os.listdir('src/models/model1'))"
           # cd ../../../..
           # echo "\`\`\`" >> report.md
 
