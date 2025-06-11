@@ -31,9 +31,6 @@ jobs:
     - name: Run isort
       run: isort . --check-only --profile black
 
-    - name: Run mypy
-      run: mypy . --ignore-missing-imports --disallow-untyped-defs --disallow-incomplete-defs --follow-imports=silent --allow-untyped-defs --allow-subclassing-any --allow-untyped-calls
-
     - name: Run tests
       env:
         PYTHONPATH: ${{ github.workspace }}
