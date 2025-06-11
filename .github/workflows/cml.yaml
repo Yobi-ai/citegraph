@@ -37,9 +37,9 @@ jobs:
           # Training section
           echo "## Training Metrics" >> report.md
           echo "### Training Progress (at 50-epoch intervals)" >> report.md
-          echo "\`\`\`" >> report.md
-          python src/models/model1/train.py epochs=100 2>&1 | tee -a report.md
-          echo "\`\`\`" >> report.md
+          #echo "\`\`\`" >> report.md
+          python src/models/model1/train.py epochs=50 #2>&1 | tee -a report.md
+          #echo "\`\`\`" >> report.md
 
       - name: Evaluate model
         env:
@@ -50,19 +50,19 @@ jobs:
           # Evaluation section
           echo "## Model Evaluation" >> report.md
           echo "### Test Results" >> report.md
-          echo "\`\`\`" >> report.md
+          #echo "\`\`\`" >> report.md
           # Run test script from the src directory to handle relative imports
           cd src/models/model1
-          python test.py 2>&1 | tee -a ../../../../report.md
-          cd ../../../..
-          echo "\`\`\`" >> report.md
+          python test.py #2>&1 | tee -a ../../../../report.md
+          # cd ../../../..
+          #echo "\`\`\`" >> report.md
 
-          # Add any evaluation metrics or visualizations
+          # # Add any evaluation metrics or visualizations
           if [ -f "evaluation_report.txt" ]; then
             echo "### Detailed Evaluation Metrics" >> report.md
-            echo "\`\`\`" >> report.md
+            #echo "\`\`\`" >> report.md
             cat evaluation_report.txt >> report.md
-            echo "\`\`\`" >> report.md
+            #echo "\`\`\`" >> report.md
           fi
 
       - name: Generate visualizations
@@ -74,17 +74,20 @@ jobs:
 
           if [ -f "confusion_matrix.png" ]; then
             echo "### Confusion Matrix" >> report.md
-            cml-publish confusion_matrix.png --md >> report.md
+            echo "![](./confusion_matrix.png)" >> report.md
+            #cml-publish confusion_matrix.png --md >> report.md
           fi
 
           if [ -f "learning_curves.png" ]; then
             echo "### Learning Curves" >> report.md
-            cml-publish learning_curves.png --md >> report.md
+            echo "![](./learning_curves.png)" >> report.md
+            #cml-publish learning_curves.png --md >> report.md
           fi
 
           if [ -f "model_architecture.png" ]; then
             echo "### Model Architecture" >> report.md
-            cml-publish model_architecture.png --md >> report.md
+            echo "![](./model_architecture.png)" >> report.md
+            #cml-publish model_architecture.png --md >> report.md
           fi
 
       - name: Post report
