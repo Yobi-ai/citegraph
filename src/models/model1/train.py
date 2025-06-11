@@ -207,7 +207,8 @@ class Trainer:
         self._file.close()
 
     def __plot(self) -> None:
-        df = pd.read_csv("training_results.csv")
+        df = pd.read_csv("training_results.csv", header=0)
+        print(df)
         plt.figure(figsize=(10, 6))
         plt.plot(df["Epoch"], df["Train_Loss"], label="Training Loss")
         plt.plot(df["Epoch"], df["Val_Loss"], label="Validation Loss")
