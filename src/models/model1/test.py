@@ -44,9 +44,7 @@ def main(cfg: DictConfig) -> None:
         model = Model(f"{cfg.model_path}/model.pth")
     except Exception:
         model = GCN(1433, 717, 7)
-        model.load_state_dict(
-            torch.load(f"{cfg.model_state_path}/model_state_dict.pth")
-        )
+        model.load_state_dict(torch.load(f"{cfg.model_path}/model_state_dict.pth"))
 
     data = Dataset().load_cora(cfg.data_path)[0]
     test(model, data)
