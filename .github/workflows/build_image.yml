@@ -28,6 +28,7 @@ jobs:
       uses: google-github-actions/auth@v2
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        project_id: infra-actor-462322-s1
 
     - name: Configure Docker for Artifact Registry
       run: |
@@ -52,9 +53,9 @@ jobs:
         docker push $IMAGE_URI:latest
 
     - name: Deploy to Cloud Run
-      uses: google-github-actions/deploy-cloudrun@v0
+      uses: google-github-actions/deploy-cloudrun@v2
       with:
         service: my-service
         image: us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph/graph_image:latest
         region: us-east1
-        credentials: ${{ secrets.GCP_SA_KEY }}
+        project_id: infra-actor-462322-s1
