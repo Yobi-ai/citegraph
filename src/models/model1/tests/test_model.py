@@ -1,6 +1,6 @@
 import torch
 
-from ..model import GCN
+from src.models.model1.model import GCN
 
 
 def test_model_initialization():
