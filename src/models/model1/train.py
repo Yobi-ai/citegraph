@@ -16,8 +16,7 @@ import torch.nn.functional as F
 from omegaconf import DictConfig, OmegaConf
 from rich import print
 
-from utils.monitor import log_system_metrics
-
+from ...utils.monitor import log_system_metrics
 from .dataloader import Dataset
 from .model import GCN
 
