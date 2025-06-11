@@ -172,6 +172,15 @@ class Trainer:
                 print(f"mlflow run ID: {run.info.run_id}")
 
             finally:
+                os.makedirs("./final_model", exist_ok=True)
+                torch.save(self.model, "./final_model/model.pth")
+                torch.save(
+                    self.model.state_dict(), "./final_model/model_state_dict.pth"
+                )
+                print(
+                    "[bold green]Saved Final Model and State Dictionary Successfully![/bold green]"
+                )
+
                 # Disable profiler and save results
                 profiler.disable()
                 stats = pstats.Stats(profiler)
