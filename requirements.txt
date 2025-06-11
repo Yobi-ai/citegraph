@@ -21,3 +21,4 @@ nltk~=3.9
 python-multipart>=0.0.6
 gradio~=5.20
 matplotlib~=3.10
+pandas~=2.2

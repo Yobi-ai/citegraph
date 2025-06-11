@@ -40,6 +40,8 @@ def test(model, data):
             )
         confmat = confusion_matrix(data.y[data.test_mask], pred[data.test_mask])
         print(confmat)
+        plt.figure(figsize=(15, 15))
+        plt.xticks(rotation=90)
         disp = ConfusionMatrixDisplay(
             confusion_matrix=confmat, display_labels=labels_list
         )
