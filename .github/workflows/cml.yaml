@@ -31,35 +31,25 @@ jobs:
           # Install dependencies
           pip install -r requirements.txt
 
-          # Run training with test configuration and capture output
+          # Run training and capture specific metrics
           echo "## Training Report" > results.txt
-          echo "### Training Metrics" >> results.txt
+          echo "### Training Metrics (at 50-epoch intervals)" >> results.txt
           echo "\`\`\`" >> results.txt
-          python src/models/model1/train.py epochs=500 2>&1 | tee -a results.txt
+          python src/models/model1/train.py epochs=500 2>&1 | grep -E "Epoch: [0-9]+00," >> results.txt
           echo "\`\`\`" >> results.txt
 
-          # Get latest MLflow metrics
-          echo "### Latest MLflow Metrics" >> results.txt
-          echo "\`\`\`" >> results.txt
-          if [ -d "mlruns" ]; then
-            # Find the latest run directory
-            LATEST_RUN=$(ls -t mlruns/*/ | head -n1)
-            if [ -n "$LATEST_RUN" ]; then
-              echo "Latest run metrics:" >> results.txt
-              if [ -f "${LATEST_RUN}metrics" ]; then
-                cat "${LATEST_RUN}metrics" >> results.txt
-              fi
-              if [ -f "${LATEST_RUN}params" ]; then
-                echo -e "\nRun parameters:" >> results.txt
-                cat "${LATEST_RUN}params" >> results.txt
-              fi
-            else
-              echo "No MLflow runs found" >> results.txt
-            fi
-          else
-            echo "MLflow directory not found" >> results.txt
-          fi
-          echo "\`\`\`" >> results.txt
+      - name: Evaluate model
+        run: |
+            python src/models/model1/test.py
+      - name: Write report
+        env:
+          # this authenticates that the right permissions are in place
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # send all information to report.md that will be reported to us when the workflow finish
+          cat evaluation_report.txt >> report.md
+          cml-publish confusion_matrix.png --md >> report.md
+          cml-send-comment report.md
 
       - name: Write CML report
         env:
