@@ -56,8 +56,8 @@ jobs:
           echo "### Test Results" >> report.md
           # echo "\`\`\`" >> report.md
           # Run test script from the src directory to handle relative imports
-          cd src/models/model1
-          python test.py # 2>&1 | tee -a ../../../../report.md
+          # cd src/models/model1
+          python src/models/model1/test.py # 2>&1 | tee -a ../../../../report.md
           python -c "print('Testing again')"
           python -c "import os; print(os.listdir())"
           # python -c "import os; print(os.listdir('src/models/model1'))"

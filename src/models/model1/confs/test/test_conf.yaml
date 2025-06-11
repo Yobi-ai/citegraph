@@ -1,2 +1,2 @@
-model_path: "model_final"
+model_path: "final_model"
 data_path: "/app/data/processed"
