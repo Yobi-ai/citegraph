@@ -37,9 +37,11 @@ jobs:
           # Training section
           echo "## Training Metrics" >> report.md
           echo "### Training Progress (at 50-epoch intervals)" >> report.md
-          #echo "\`\`\`" >> report.md
-          python src/models/model1/train.py epochs=50 #2>&1 | tee -a report.md
-          #echo "\`\`\`" >> report.md
+          # echo "\`\`\`" >> report.md
+          echo "Test"
+          # echo "Test2"
+          python src/models/model1/train.py epochs=50 # 2>&1 | tee -a report.md
+          # echo "\`\`\`" >> report.md
 
       - name: Evaluate model
         env:
@@ -50,12 +52,12 @@ jobs:
           # Evaluation section
           echo "## Model Evaluation" >> report.md
           echo "### Test Results" >> report.md
-          #echo "\`\`\`" >> report.md
+          # echo "\`\`\`" >> report.md
           # Run test script from the src directory to handle relative imports
           cd src/models/model1
-          python test.py #2>&1 | tee -a ../../../../report.md
+          python test.py # 2>&1 | tee -a ../../../../report.md
           # cd ../../../..
-          #echo "\`\`\`" >> report.md
+          # echo "\`\`\`" >> report.md
 
           # # Add any evaluation metrics or visualizations
           if [ -f "evaluation_report.txt" ]; then
