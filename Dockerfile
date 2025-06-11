@@ -11,7 +11,9 @@ ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
     MODEL_PATH=/app/models/model_5000.pth \
     DATA_PATH=/app/data/processed \
-    VOCAB_ROOT_FOLDER=/app/data/Cora/CoRA_Raw
+    VOCAB_ROOT_FOLDER=/app/data/Cora/CoRA_Raw \
+    FORCE_CUDA=0 \
+    TORCH_CUDA_ARCH_LIST="None"
 
 # Set working directory
 WORKDIR /app
@@ -37,9 +39,6 @@ COPY models/model_5000.pth /app/models/
 
 COPY models/model_5000_state_dict.pth /app/models/
 
-# Copy vocabulary and data files
-# COPY src/data/Cora/CoRA_Raw/final_words_dictionary.txt /app/data/Cora/CoRA_Raw/
-
 # Copy the rest of the application
 COPY . .
 
@@ -49,17 +48,6 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8001
-
-# # Create necessary directories and ensure they exist
-# RUN mkdir -p data/raw data/processed data/interim data/external \
-#     models \
-#     reports/figures && \
-#     touch data/raw/.gitkeep \
-#     data/processed/.gitkeep \
-#     data/interim/.gitkeep \
-#     data/external/.gitkeep \
-#     models/.gitkeep \
-#     reports/figures/.gitkeep
 
 # Set default command
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8001"]

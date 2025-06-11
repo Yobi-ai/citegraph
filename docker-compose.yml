@@ -1,15 +1,9 @@
-version: '3.8'
-
 services:
   citegraph:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: us-east1-docker.pkg.dev/infra-actor-462322-s1/citegraph/graph_image:latest
     ports:
       - "8001:8001"
     restart: unless-stopped
-    networks:
-      - app-network
     volumes:
       - .:/app
       - ./data:/app/data
@@ -18,6 +12,8 @@ services:
     environment:
       - MODEL_PATH=/app/models/model_5000.pth
       - DATA_PATH=/app/data/processed
+      - FORCE_CUDA=0
+      - TORCH_CUDA_ARCH_LIST=None
 
 networks:
   app-network:
