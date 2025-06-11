@@ -88,3 +88,14 @@ target/
 # Mypy cache
 .mypy_cache/
 .ruff_cache/
+
+# hydra
+configs/
+outputs/
+src/models/model1/outputs/
+
+# mlflow
+mlruns/
+
+# logger logs
+src/models/model1/logs
