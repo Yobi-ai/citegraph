@@ -31,33 +31,67 @@ jobs:
           # Install dependencies
           pip install -r requirements.txt
 
-          # Run training and capture specific metrics
-          echo "## Training Report" > results.txt
-          echo "### Training Metrics (at 50-epoch intervals)" >> results.txt
-          echo "\`\`\`" >> results.txt
-          python src/models/model1/train.py epochs=500 2>&1 | tee -a results.txt
-          echo "\`\`\`" >> results.txt
+          # Create comprehensive report
+          echo "# Model Training and Evaluation Report" > report.md
+
+          # Training section
+          echo "## Training Metrics" >> report.md
+          echo "### Training Progress (at 50-epoch intervals)" >> report.md
+          echo "\`\`\`" >> report.md
+          python src/models/model1/train.py epochs=500 2>&1 | tee -a report.md
+          echo "\`\`\`" >> report.md
 
       - name: Evaluate model
         env:
           PYTHONPATH: ${{ github.workspace }}/src
         run: |
           cd ${{ github.workspace }}
-          python -m src.models.model1.test
-      - name: Write report
-        env:
-          # this authenticates that the right permissions are in place
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # send all information to report.md that will be reported to us when the workflow finish
-          cat evaluation_report.txt >> report.md
-          cml-publish confusion_matrix.png --md >> report.md
-          cml-send-comment report.md
 
-      - name: Write CML report
+          # Evaluation section
+          echo "## Model Evaluation" >> report.md
+          echo "### Test Results" >> report.md
+          echo "\`\`\`" >> report.md
+          python -m src.models.model1.test 2>&1 | tee -a report.md
+          echo "\`\`\`" >> report.md
+
+          # Add any evaluation metrics or visualizations
+          if [ -f "evaluation_report.txt" ]; then
+            echo "### Detailed Evaluation Metrics" >> report.md
+            echo "\`\`\`" >> report.md
+            cat evaluation_report.txt >> report.md
+            echo "\`\`\`" >> report.md
+          fi
+
+      - name: Generate visualizations
+        run: |
+          cd ${{ github.workspace }}
+
+          # Add visualizations section if they exist
+          echo "## Model Visualizations" >> report.md
+
+          if [ -f "confusion_matrix.png" ]; then
+            echo "### Confusion Matrix" >> report.md
+            cml-publish confusion_matrix.png --md >> report.md
+          fi
+
+          if [ -f "learning_curves.png" ]; then
+            echo "### Learning Curves" >> report.md
+            cml-publish learning_curves.png --md >> report.md
+          fi
+
+          if [ -f "model_architecture.png" ]; then
+            echo "### Model Architecture" >> report.md
+            cml-publish model_architecture.png --md >> report.md
+          fi
+
+      - name: Post report
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Post reports as comments in GitHub PRs
-          cat results.txt >> report.md
+          # Add timestamp and commit info
+          echo "## Report Information" >> report.md
+          echo "Generated on: $(date)" >> report.md
+          echo "Commit: ${{ github.sha }}" >> report.md
+
+          # Post the complete report
           cml comment create report.md
