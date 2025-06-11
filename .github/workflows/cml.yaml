@@ -38,7 +38,7 @@ jobs:
           echo "## Training Metrics" >> report.md
           echo "### Training Progress (at 50-epoch intervals)" >> report.md
           echo "\`\`\`" >> report.md
-          python src/models/model1/train.py epochs=500 2>&1 | tee -a report.md
+          python src/models/model1/train.py epochs=100 2>&1 | tee -a report.md
           echo "\`\`\`" >> report.md
 
       - name: Evaluate model
@@ -51,7 +51,7 @@ jobs:
           echo "## Model Evaluation" >> report.md
           echo "### Test Results" >> report.md
           echo "\`\`\`" >> report.md
-          python -m src.models.model1.test.py 2>&1 | tee -a report.md
+          python src/models/model1/test.py 2>&1 | tee -a report.md
           echo "\`\`\`" >> report.md
 
           # Add any evaluation metrics or visualizations
