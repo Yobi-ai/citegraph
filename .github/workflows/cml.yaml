@@ -62,9 +62,9 @@ jobs:
           # # Add any evaluation metrics or visualizations
           if [ -f "evaluation_report.txt" ]; then
             echo "### Detailed Evaluation Metrics" >> report.md
-            #echo "\`\`\`" >> report.md
+            # echo "\`\`\`" >> report.md
             cat evaluation_report.txt >> report.md
-            #echo "\`\`\`" >> report.md
+            # echo "\`\`\`" >> report.md
           fi
 
       - name: Generate visualizations
@@ -77,19 +77,19 @@ jobs:
           if [ -f "confusion_matrix.png" ]; then
             echo "### Confusion Matrix" >> report.md
             echo "![](./confusion_matrix.png)" >> report.md
-            #cml-publish confusion_matrix.png --md >> report.md
+            # cml-publish confusion_matrix.png --md >> report.md
           fi
 
           if [ -f "learning_curves.png" ]; then
             echo "### Learning Curves" >> report.md
             echo "![](./learning_curves.png)" >> report.md
-            #cml-publish learning_curves.png --md >> report.md
+            # cml-publish learning_curves.png --md >> report.md
           fi
 
           if [ -f "model_architecture.png" ]; then
             echo "### Model Architecture" >> report.md
             echo "![](./model_architecture.png)" >> report.md
-            #cml-publish model_architecture.png --md >> report.md
+            # cml-publish model_architecture.png --md >> report.md
           fi
 
       - name: Post report
