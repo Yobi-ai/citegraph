@@ -320,7 +320,7 @@ The project uses GitHub Actions for continuous integration. The workflow is defi
    - Shows coverage report in the terminal
 
 ### CI/CML Pipeline:
-Triggered  whenever a commit is pushed to the main branch
+Triggered  whenever a commit is pushed to a PR supposed to be merged with main.
 1. **Training**
    - Runs the training script and stores the final training metrics in the commit/pr report and the models as well.
 
@@ -379,11 +379,15 @@ git push origin main
 
 4. CI/CML:
 ![image](https://github.com/user-attachments/assets/3ed4c64e-379f-4b52-ac8f-4ff601767c81)
+![image](https://github.com/user-attachments/assets/8a18adb0-8535-4d5e-ad24-fed0afbc9308)
+
 PR: https://github.com/Yobi-ai/citegraph/pull/38
 
 5: Huggingface Deployment:
 ![image](https://github.com/user-attachments/assets/1c25b5d2-7e13-4684-8fca-83015cc57dfd)
 ![image](https://github.com/user-attachments/assets/033a616f-6775-48e6-80b9-2e41e6f5c8e3)
+![image](https://github.com/user-attachments/assets/91b0d09f-9762-46b0-b07b-1b9f97a4a083)
+
 Link: https://huggingface.co/spaces/psujay/citegraph
 
 
