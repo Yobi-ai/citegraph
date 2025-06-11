@@ -15,10 +15,11 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
-from dataloader import Dataset
-from model import GCN
 from omegaconf import DictConfig, OmegaConf
 from rich import print
+
+from src.models.model1.dataloader import Dataset
+from src.models.model1.model import GCN
 
 from src.utils.monitor import log_system_metrics
 

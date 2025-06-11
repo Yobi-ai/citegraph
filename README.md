@@ -16,10 +16,10 @@ Citation Network
         It uses node features and edge connections to improve classification performance over traditional NLP methods.
 
 - [ ] Problem statement and motivation:
-        Traditional NLP methods classify papers solely on content, ignoring rich interconnections that exist between them. 
-        Our project explores how graph-based learning can often outperform these traditional methods and how to set up a fully 
-        functioning pipeline to integrate, deploy and reproduce the outcome. Citation networks have been found to prove meaningful 
-        relations between documents in academic research papers. These relations often indicate similarities in topics, which are 
+        Traditional NLP methods classify papers solely on content, ignoring rich interconnections that exist between them.
+        Our project explores how graph-based learning can often outperform these traditional methods and how to set up a fully
+        functioning pipeline to integrate, deploy and reproduce the outcome. Citation networks have been found to prove meaningful
+        relations between documents in academic research papers. These relations often indicate similarities in topics, which are
         often ignored by traditional text classification models.
 
 - [ ] Main objectives:
@@ -262,6 +262,103 @@ ruff check .
 mypy .
 ```
 
+### Testing
+
+The project uses pytest for testing. Tests are located in the `src/models/model1/tests/` directory. To run the tests:
+
+```bash
+# Run all tests
+pytest src/
+
+# Run tests with coverage
+pytest src/ --cov=src --cov-report=term-missing
+```
+
+### Pre-commit Hooks
+
+The project uses pre-commit hooks to ensure code quality. The following hooks are configured:
+
+1. **pre-commit-hooks**:
+   - trailing-whitespace: Removes trailing whitespace
+   - end-of-file-fixer: Ensures files end with a newline
+   - check-yaml: Validates YAML files
+   - check-ast: Validates Python syntax
+   - check-json: Validates JSON files
+   - check-merge-conflict: Detects merge conflict strings
+   - detect-private-key: Detects private keys
+
+2. **isort**:
+   - Sorts Python imports
+   - Uses black profile for compatibility
+
+3. **ruff**:
+   - Python linter
+   - Auto-fixes issues where possible
+
+4. **mypy**:
+   - Static type checking
+   - Additional type stubs for PyYAML, requests, setuptools, and urllib3
+   - Configured to be strict with type checking
+
+To install pre-commit hooks:
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+### CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration. The workflow is defined in `.github/workflows/code_quality.yml` and includes:
+
+1. **Code Quality Checks**:
+   - isort: Checks import sorting
+   - mypy: Runs type checking
+   - pytest: Runs tests with coverage
+
+2. **Coverage Reporting**:
+   - Uses pytest-cov for coverage reporting
+   - Shows coverage report in the terminal
+
+### Docker Image Build and Deployment
+
+The project includes an automated Docker image build and deployment workflow (`.github/workflows/build_image.yml`) that:
+
+1. **Triggers**:
+   - On version tags (e.g., v1.0.0)
+   - On pushes to main branch
+
+2. **Build Process**:
+   - Uses Docker Buildx for efficient builds
+   - Authenticates with Google Cloud Platform
+   - Configures Docker for Google Artifact Registry
+   - Sets version tags based on git tags or commit SHA
+
+3. **Image Versioning**:
+   - Latest tag for the most recent build
+   - Version-specific tags (e.g., v1.0.0)
+   - Development tags for non-release builds
+
+4. **Deployment**:
+   - Automatically deploys to Google Cloud Run
+   - Configures service with:
+     - 2GB memory
+     - 2 CPU cores
+     - Public access enabled
+
+5. **Required Secrets**:
+   - `GCP_SA_KEY`: Google Cloud service account key
+   - Project ID and region configured in workflow
+
+To trigger a new build and deployment:
+```bash
+# For a new version
+git tag v1.0.0
+git push origin v1.0.0
+
+# For development builds
+git push origin main
+```
+
 ### Code Debugging
 - The code was debugged using the built in debugger, breakpoint and step-over functionality of VS code.
 - Some Debugging Scenarios include:
@@ -272,16 +369,16 @@ mypy .
 - [ ] Briefly describe each team member's contributions
 
         Alen:
-        - Setup project repository and initialised cookiecutter template. 
+        - Setup project repository and initialised cookiecutter template.
         - Researched on project ideas and created the architecture diagram.
-        - Integrated linting and formatting tools with git actions. 
+        - Integrated linting and formatting tools with git actions.
         - Created proposal documentation.
         - Created dockerfile and docker-compose.yml to build inference image
         - Integrated psutil to log system usage metrics
         - Integrated Cprofiler to create profile of funtions running and ouput to .prof file
         - updated readme with necessary documentation.
 
-        Sujay: 
+        Sujay:
         - Setup the Environment and requirements
         - Initialized data versioning
         - Created Training Notebook
@@ -330,13 +427,13 @@ Project Organization
 
 ```
 citegraph/
-├── LICENSE     
-├── README.md                  
-├── Makefile                     # Makefile with commands like `make data` or `make train`                   
+├── LICENSE
+├── README.md
+├── Makefile                     # Makefile with commands like `make data` or `make train`
 ├── configs                      # Config files (models and training hyperparameters)
-│   └── model1.yaml              
+│   └── model1.yaml
 │
-├── data                         
+├── data
 │   ├── external                 # Data from third party sources.
 │   ├── interim                  # Intermediate data that has been transformed.
 │   ├── processed                # The final, canonical data sets for modeling.
@@ -358,25 +455,25 @@ citegraph/
     ├── __init__.py              # Makes src a Python module.
     │
     ├── data                     # Data engineering scripts.
-    │   ├── build_features.py    
-    │   ├── cleaning.py          
-    │   ├── ingestion.py         
-    │   ├── labeling.py          
-    │   ├── splitting.py         
-    │   └── validation.py        
+    │   ├── build_features.py
+    │   ├── cleaning.py
+    │   ├── ingestion.py
+    │   ├── labeling.py
+    │   ├── splitting.py
+    │   └── validation.py
     │
     ├── models                   # ML model engineering (a folder for each model).
-    │   └── model1      
-    │       ├── dataloader.py    
-    │       ├── hyperparameters_tuning.py 
-    │       ├── model.py         
-    │       ├── predict.py       
-    │       ├── preprocessing.py 
-    │       └── train.py         
+    │   └── model1
+    │       ├── dataloader.py
+    │       ├── hyperparameters_tuning.py
+    │       ├── model.py
+    │       ├── predict.py
+    │       ├── preprocessing.py
+    │       └── train.py
     │
     └── visualization        # Scripts to create exploratory and results oriented visualizations.
-        ├── evaluation.py        
-        └── exploration.py       
+        ├── evaluation.py
+        └── exploration.py
 ```
 
 ## 8. Project Proposal
@@ -389,14 +486,14 @@ NLP methods that exist traditionally classify papers solely on content ignoring 
 - Use graph based models like GAT, GCN for node classification.
 - To integrate open source tools like Pytorch Geometric and MLflow into the workflow.
 - To track experiments and version control collaboratively using git, DVC etc.
-  
+
 #### Success Metrics
 The success metrics used in this project will be divided into two parts. The first part is the success metrics for the model training. Here the selected success metrics are negative log likelihood loss and accuracy. The negative log likelihood is good for classification problem such as this project. The second part is the CI/CD pipeline. Here we will be looking for reproducibility which means the entire pipeline will be reproducible and reliability which means the system will be reliable and have fault tolerance.
 
 #### Description:
 Citation networks have been found to prove meaningful relations between documents in academic research papers. These relations often indicate similarities in topics, which are often ignored by traditional text classification models. Our project aims to exploit this relation structure using Graph Neural Networks specifically GCN and GAT.
 
-We have chosen the Cora dataset, which consists of 2708 papers, each described by a sparse bag-of-words vector and labeled under one of seven categories. Edges represent the citation relation between papers. This graph structure is well suited for GNN’s which update each node’s representation by aggregation of features from its neighbours. We will work on both GCN and GAT.
+We have chosen the Cora dataset, which consists of 2708 papers, each described by a sparse bag-of-words vector and labeled under one of seven categories. Edges represent the citation relation between papers. This graph structure is well suited for GNN's which update each node's representation by aggregation of features from its neighbours. We will work on both GCN and GAT.
 
 Our core framework would be Pytorch Geometric, an open source library that simplifies GNN implementations on Pytorch/Keras. It also provides built-in support for full batch training on citation networks, model wrappers for GCN and GAT and easily integrates with existing ML workflows.
 
@@ -422,7 +519,7 @@ We have considered two architectures: Graph Convolutional Networks and Graph Att
 Currently we have already trained Graph Convolutional Networks which is giving up to 79% accuracy on the test subset of the Cora data. But the attention mechanism of Graph Attention Networks are shown to learn significantly more important features and correlation using the attention mechanism. Hence, by the next phase we might switch to Graph Attention Networks and compare the results.
 
 #### Source/Citation for any pre built models
-We haven’t used any pre-built models yet. We have built our own architecture for the Graph Convolutional Network.
+We haven't used any pre-built models yet. We have built our own architecture for the Graph Convolutional Network.
 
 ### 8.4 Open-source Tools
 #### Third-party packages
@@ -444,5 +541,5 @@ scikit-learn: Provides tools for data preprocessing, model evaluation, and tradi
 
 --------
 <p><small>Project based on the <a target="_blank" href="https://github.com/Chim-SO/cookiecutter-mlops/">cookiecutter MLOps project template</a>
-that is originally based on <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. 
+that is originally based on <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>.
 #cookiecuttermlops #cookiecutterdatascience</small></p>
