@@ -2,15 +2,14 @@ import hydra
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
+from dataloader import Dataset
+from model import GCN, Model
 from omegaconf import DictConfig
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
     classification_report,
     confusion_matrix,
 )
-
-from .dataloader import Dataset
-from .model import GCN, Model
 
 
 def test(model, data):
